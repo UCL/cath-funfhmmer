@@ -1,8 +1,10 @@
 # cath-funfhmmer
 
-Split GeMMA clusters into functionally coherent alignments (FunFams)
+# Overview
 
-## Nothing to see here...
+This is one of the repos that's used in generating FunFams.
 
-The code in this repo is one step in the larger [cath-funfam](https://github.com/UCL/cath-funfam) project on GitHub. If you are trying to create CATH Functional families, then it's probably best to go take a look there first.
+This repo splits GeMMA clusters into functionally coherent alignments (FunFams).
+
+For the master repo, please see https://github.com/UCL/cath-funfam
 
