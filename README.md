@@ -8,6 +8,17 @@ This repo splits GeMMA clusters into functionally coherent alignments (FunFams).
 
 For the master repo, please see https://github.com/UCL/cath-funfam
 
+# Code dependencies
+
+The following Perl Modules have been used in the code: 
+
+	1. BioPerl
+	2. File::Slurp
+	3. List::Util
+	4. Statistics::Descriptive
+
+These are available here: /cath/homes2/ucbtdas/Working/eclipse_workspace/FunFHMMer_code/github_resources/perl_modules/
+
 # Relevant Papers
 
 1. [Functional classification of CATH superfamilies: a domain-based approach for protein function annotation](https://doi.org/10.1093/bioinformatics/btv398)
