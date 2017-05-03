@@ -1,4 +1,4 @@
-Generating CATH superfamily and FunFam assignments for genomes
+Generating CATH superfamily and FunFam assignments for genomes using DomainFinder3
 ======
 
 1. Go to working directory
@@ -25,10 +25,11 @@ gunzip ./cath_models/funfam.hmm3.TC.lib.gz
 tar zxf hmmer-3.1b2-linux-intel-x86_64.tar.gz
 ~~~~~
 
-5. Download [DomainFinder3](https://github.com/ebi-pf-team/interproscan/blob/master/core/jms-implementation/support-mini-x86-32/bin/gene3d/DomainFinder3)
+5. Download [DomainFinder3](https://github.com/UCL/cath-funfhmmer/blob/master/genome_assignments/DF.tar.gz)
 
 ~~~~~
-wget "https://github.com/ebi-pf-team/interproscan/blob/master/core/jms-implementation/support-mini-x86-32/bin/gene3d/DomainFinder3"
+wget "https://github.com/UCL/cath-funfhmmer/blob/master/genome_assignments/DF.tar.gz"
+tar zxf DF.tar.gz
 ~~~~~
 
 6. For generating CATH FunFam assignments for the sequences, the sequences are scanned against the CATH FunFam models and only those which meet the FunFam inclusion threshold are reported.
