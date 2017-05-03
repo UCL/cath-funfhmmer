@@ -1,4 +1,4 @@
-Generating CATH superfamily and FunFam assignments for genomes
+Generating CATH superfamily and FunFam assignments for genomes using cath-resolve-hits
 ======
 
 1. Go to working directory
