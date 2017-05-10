@@ -26,7 +26,7 @@ tar zxf hmmer-3.1b2-linux-intel-x86_64.tar.gz
 ~~~~~
 
 5. Download [cath-resolve-hits](https://github.com/UCLOrengoGroup/cath-tools/releases/download/v0.13.1/cath-resolve-hits).
-Detailed documents of this tool is available [here](http://cath-tools.readthedocs.io/en/latest/tools/cath-resolve-hits/). 
+Detailed documentation of this tool is available [here](http://cath-tools.readthedocs.io/en/latest/tools/cath-resolve-hits/). 
 
 ~~~~~
 wget "https://github.com/UCLOrengoGroup/cath-tools/releases/download/v0.13.1/cath-resolve-hits"
