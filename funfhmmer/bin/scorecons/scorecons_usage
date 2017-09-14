@@ -1,0 +1,2 @@
+./scorecons -a ./test.aln -o ./test.scons -m ./PET91mod.mat2 > ./test.dops
+
