@@ -1,5 +1,5 @@
-#$ -S /bin/bash -t 1-123
-# Told the SGE that this is an array job, with "tasks" to be numbered 1 to n (one for each job)
+#$ -S /bin/bash -t 1-<JOBNUM>
+# Told the SGE that this is an array job, with "tasks" to be numbered 1 to <JOBNUM> (one for each job)
 
 # execute job from the current working directory (i.e. submission dir)
 #$ -cwd
@@ -14,10 +14,10 @@
 #$ -j y
 
 # stdoutput file pathname
-#$ -o /home/ucbtdas/GeMMA_benchmarking/FFer_standalone_TL_bchuckle/job_status
+#$ -o /home/ucbtdas/GeMMA_benchmarking/funfhmmer/job_status
 
 # Set the FunFHMMer project directory
-DIR=/home/ucbtdas/GeMMA_benchmarking/funfhmmer_standalone
+DIR=/home/ucbtdas/GeMMA_benchmarking/funfhmmer
 DATADIR=$DIR/data
 APPSDIR=$DIR/apps
 RESULTSDIR=$DIR/results

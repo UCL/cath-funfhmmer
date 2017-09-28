@@ -1,10 +1,10 @@
 #!/bin/bash
 
 # Set the FunFHMMer project directory
-DIR=/cath/homes2/ucbtdas/Working/eclipse_workspace/FunFHMMer_code/github_resources/scripts/FFer_standalone_TL_bchuckle
+DIR=${PROJECTHOME}
 DATADIR=$DIR/data
 APPSDIR=$DIR/apps
-SFLISTFILE=$DIR/data/superfamilies.torun.list
+SFLISTFILE=$DATADIR/superfamilies.torun.list
 STARTINGCLUSTERLISTDIR=$DATADIR/starting_cluster_lists
 STARTINGCLUSTERDATA=/cath/people2/ucbctnl/GeMMA/v4_0_0/starting_clusters
 GEMMADATA=/cath/people2/ucbctnl/GeMMA/bchuckle_trees
@@ -41,8 +41,16 @@ do
 			rsync -arv $STARTINGCLUSTERDATA/$superfamily/*.faa ${superfamilytree} >> $LOGFILE
 			superfamilytree_name=$(basename ${superfamilytree})
 			echo "${superfamily} ${superfamilytree_name}" >> $SFTREELISTFILE
+			
 		done
 	fi
 done
 
-echo "4. Done. Copy project folder to Bchuckle to start running FFer."
+echo "4. Done."
+
+fileinfo=$(wc $SFTREELISTFILE)
+JOBNUM=$(echo $fileinfo|cut -d' ' -f1)
+echo ""
+echo "** JOBNUM=$JOBNUM jobs need to be run**"
+export HPC_JOBNUM=${JOBNUM}
+echo ""
