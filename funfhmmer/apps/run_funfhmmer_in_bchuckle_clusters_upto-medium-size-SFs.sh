@@ -1,23 +1,22 @@
-#$ -S /bin/bash -t 1-<JOBNUM>
-# Told the SGE that this is an array job, with "tasks" to be numbered 1 to <JOBNUM> (one for each job)
+#$ -S /bin/bash
 
-# execute job from the current working directory (i.e. submission dir)
+# execute job from the current working directory
 #$ -cwd
 
 # max runtime
-#$ -l h_rt=12:0:0
+#$ -l h_rt=1:0:0
 
 # memory requirements
-#$ -l h_vmem=4G,tmem=4G
+#$ -l h_vmem=1G,tmem=1G
 
 # merge the stdout and stderr into one file
 #$ -j y
 
 # stdoutput file pathname
-#$ -o /home/ucbtdas/GeMMA_benchmarking/funfhmmer/job_status
+#$ -o ../job_status
 
 # Set the FunFHMMer project directory
-DIR=/home/ucbtdas/GeMMA_benchmarking/funfhmmer
+DIR=/cluster/project8/ff_stability/funfhmmer-2018/funfhmmer
 DATADIR=$DIR/data
 APPSDIR=$DIR/apps
 RESULTSDIR=$DIR/results
@@ -41,18 +40,21 @@ cd $LOCAL_TMP_DIR
 echo "[$time] #Start copying starting clusters of ${superfamily} with ${superfamilytree} TREE.."
 
 #Copy the folder to FFer working dir
-rsync -raz $DATADIR/$superfamily/$superfamilytree/ $LOCAL_TMP_DIR/$superfamily.$superfamilytree/
+rsync -raz $DATADIR/$superfamily/$superfamilytree/ $LOCAL_TMP_DIR/$superfamily/
 
 echo "[$time] #---DONE"
 
-perl $APPSDIR/funfhmmer.pl --sup $superfamily --dir $LOCAL_TMP_DIR/$superfamily.$superfamilytree
+perl $APPSDIR/funfhmmer.pl --sup $superfamily --dir $LOCAL_TMP_DIR/$superfamily --groupsim_matrix id
+
+rm -r $LOCAL_TMP_DIR/$superfamily/merge_node_alignments/
 
 echo "[$time] #Copying FunFams for ${superfamily} with ${superfamilytree} TREE.."
 
 #Tar the FunFams from the scratch dir and copy them back to home directory
-SFTREE_FUNFAMS_TAR=$superfamily.$superfamilytree.tar.gz
+SFTREE_FUNFAMS_TAR=$superfamily.tar.gz
 
 tar -zcf $SFTREE_FUNFAMS_TAR -C $LOCAL_TMP_DIR .
-cp $SFTREE_FUNFAMS_TAR $RESULTSDIR/$superfamily.$superfamilytree.tar.gz
+cp $SFTREE_FUNFAMS_TAR $RESULTSDIR/$superfamily.tar.gz
 
 echo "[$time] #JOB COMPLETE for ${superfamily} with ${superfamilytree} TREE."
+echo ""
