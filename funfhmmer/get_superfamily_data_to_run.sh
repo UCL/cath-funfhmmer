@@ -5,52 +5,48 @@ DIR=${PROJECTHOME}
 DATADIR=$DIR/data
 APPSDIR=$DIR/apps
 SFLISTFILE=$DATADIR/superfamilies.torun.list
-STARTINGCLUSTERLISTDIR=$DATADIR/starting_cluster_lists
-STARTINGCLUSTERDATA=/cath/people2/ucbctnl/GeMMA/v4_0_0/starting_clusters
-GEMMADATA=/cath/people2/ucbctnl/GeMMA/bchuckle_trees
 LOGFILE=$DATADIR/copyingSFdata.rsynclogfile
 SFTREELISTFILE=$DATADIR/superfamilies.gemmatrees.torun.list
 
 # Make sure that the list of the superfamilies to be run is in the data folder 
 
 echo ""
-echo "1. Start Pre-processing superfamily data before running FFer in Bchuckle.."
 
-echo "2. Getting list of superfamilies in the DATA folder.."
-
-# Copy the list of the superfamily tree.trace to the data folder 
-# copy the starting clusters from the starting cluster folder to each tree folder
-# Get the tree dir list of all the superfamilies to be run 
-
-echo "3. Getting superfamily data ready for running FFer in DATA folder.."
+echo "1. Copying GEMMA data for the list of superfamilies to data/ .."
 
 if [ -f $SFTREELISTFILE ] ; then
 	rm $SFTREELISTFILE
 fi
 
-cd $GEMMADATA
+#cd $GEMMADATA
 
-cat $SFLISTFILE | while read superfamily
-
+cat $SFLISTFILE | while read superfamilyline
 do
-	if [[ $superfamily =~ ^[0-9.*] ]]; then
-		mkdir -p "$DATADIR/$superfamily"
-		rsync -arv --exclude '*.faa' $superfamily/ $DATADIR/$superfamily/ >> $LOGFILE
-		for superfamilytree in $(find $DATADIR/$superfamily/ -mindepth 1 -maxdepth 1 -type d)
-		do
-			rsync -arv $STARTINGCLUSTERDATA/$superfamily/*.faa ${superfamilytree} >> $LOGFILE
-			superfamilytree_name=$(basename ${superfamilytree})
-			echo "${superfamily} ${superfamilytree_name}" >> $SFTREELISTFILE
-			
-		done
-	fi
+	#echo "$superfamilyline"
+	stringarray=($superfamilyline)
+	superfamily=${stringarray[0]}
+	GEMMADIR=${stringarray[1]}
+	
+	#echo "${superfamily}"
+	#echo "${GEMMADIR}"
+	
+ 	if [[ $superfamily =~ ^[0-9.*] ]]; then
+ 		mkdir -p "$DATADIR/$superfamily"
+ 		rsync -arv $GEMMADIR/$superfamily/ $DATADIR/$superfamily/ >> $LOGFILE
+ 		for superfamilytree in $(find $DATADIR/$superfamily/ -mindepth 1 -maxdepth 1 -type d)
+ 		do
+ 			superfamilytree_name=$(basename ${superfamilytree})
+ 			#rsync -arv $DATADIR/$superfamily/$superfamilytree_name/starting_cluster_alignments/ $DATADIR/$superfamily/$superfamilytree_name/funfam_alignments/ >> $LOGFILE
+ 			mv $DATADIR/$superfamily/$superfamilytree_name/starting_cluster_alignments/ $DATADIR/$superfamily/$superfamilytree_name/funfam_alignments/
+ 			echo "${superfamily} ${superfamilytree_name}" >> $SFTREELISTFILE
+ 		done
+ 	fi
 done
 
-echo "4. Done."
+echo "2. Done."
 
 fileinfo=$(wc $SFTREELISTFILE)
-JOBNUM=$(echo $fileinfo|cut -d' ' -f1)
+JOBS=$(echo $fileinfo|cut -d' ' -f1)
 echo ""
-echo "** JOBNUM=$JOBNUM jobs need to be run**"
-export HPC_JOBNUM=${JOBNUM}
+echo "** JOBNUM=$JOBS **"
 echo ""
