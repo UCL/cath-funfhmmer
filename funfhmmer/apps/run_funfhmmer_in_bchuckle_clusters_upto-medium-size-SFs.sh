@@ -34,15 +34,16 @@ DATADIR=$DIR/data
 APPSDIR=$DIR/apps
 RESULTSDIR=$DIR/results
 
-SFTREELISTFILE=$DATADIR/superfamilies.gemmatrees.torun.list
+SFTREELISTFILE=$DATADIR/superfamilies.list
 
 superfamily=$(cat $SFTREELISTFILE | head -n $SGE_TASK_ID | tail -n 1 | awk '{printf $1}')
-superfamilytree=$(cat $SFTREELISTFILE | head -n $SGE_TASK_ID | tail -n 1 | awk '{printf $2}')
 	
 time=$(date)
 
+echo ""
 echo "[$time] #Processing  ${superfamily} with ${superfamilytree} TREE.."
-			
+echo ""
+
 # create working temp dir
 SCRATCH_DIR=/scratch0/ucbtdas
 LOCAL_TMP_DIR=$SCRATCH_DIR/${JOB_ID}_${SGE_TASK_ID}
@@ -51,18 +52,21 @@ mkdir -p -v $LOCAL_TMP_DIR
 	
 cd $LOCAL_TMP_DIR
 
-echo "[$time] #Start copying starting clusters of ${superfamily} with ${superfamilytree} TREE.."
+echo ""
+echo "[$time] #Start copying starting clusters of ${superfamily}.."
 
 #Copy the folder to FFer working dir
-rsync -raz $DATADIR/$superfamily/$superfamilytree/ $LOCAL_TMP_DIR/$superfamily/
+rsync -raz $DATADIR/$superfamily/ $LOCAL_TMP_DIR/$superfamily/
 
 echo "[$time] #---DONE"
+echo ""
 
 perl $APPSDIR/funfhmmer.pl --sup $superfamily --dir $LOCAL_TMP_DIR/$superfamily --groupsim_matrix id
 
 rm -r $LOCAL_TMP_DIR/$superfamily/merge_node_alignments/
 
-echo "[$time] #Copying FunFams for ${superfamily} with ${superfamilytree} TREE.."
+echo ""
+echo "[$time] #Copying back generated FunFams for ${superfamily}.."
 
 #Tar the FunFams from the scratch dir and copy them back to home directory
 SFTREE_FUNFAMS_TAR=$superfamily.tar.gz
@@ -70,5 +74,6 @@ SFTREE_FUNFAMS_TAR=$superfamily.tar.gz
 tar -zcf $SFTREE_FUNFAMS_TAR -C $LOCAL_TMP_DIR .
 cp $SFTREE_FUNFAMS_TAR $RESULTSDIR/$superfamily.tar.gz
 
-echo "[$time] #JOB COMPLETE for ${superfamily} with ${superfamilytree} TREE."
+echo ""
+echo "[$time] #JOB COMPLETE for ${superfamily}."
 echo ""
