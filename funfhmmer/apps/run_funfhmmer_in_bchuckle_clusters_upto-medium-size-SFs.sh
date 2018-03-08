@@ -15,11 +15,16 @@
 # stdoutput file pathname
 #$ -o ../job_status
 
-# Set the FunFHMMer project directory
-DIR=/cluster/project8/ff_stability/funfhmmer-2018/funfhmmer
-DATADIR=$DIR/data
-APPSDIR=$DIR/apps
-RESULTSDIR=$DIR/results
+# Get the project directory
+if [ -z $BCHUCKLE_DIR ]; then
+        echo "ERROR: Cluster dirname is empty or not passed to qsub."
+        exit
+fi
+
+DATADIR=$BCHUCKLE_DIR/data
+APPSDIR=$BCHUCKLE_DIR/apps
+RESULTSDIR=$BCHUCKLE_DIR/results
+
 SFTREELISTFILE=$DATADIR/superfamilies.gemmatrees.torun.list
 
 superfamily=$(cat $SFTREELISTFILE | head -n $SGE_TASK_ID | tail -n 1 | awk '{printf $1}')
