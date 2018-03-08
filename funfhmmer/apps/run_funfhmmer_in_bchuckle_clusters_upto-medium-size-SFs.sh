@@ -15,15 +15,23 @@
 # stdoutput file pathname
 #$ -o ../job_status
 
-# Get the project directory
-if [ -z $BCHUCKLE_DIR ]; then
-        echo "ERROR: Cluster dirname is empty or not passed to qsub."
-        exit
+
+if [ "$#" -ne 1 ]; then
+	echo "ERROR: Cluster dirname has not been passed, received $# arguments";
+	exit;
 fi
 
-DATADIR=$BCHUCKLE_DIR/data
-APPSDIR=$BCHUCKLE_DIR/apps
-RESULTSDIR=$BCHUCKLE_DIR/results
+$DIR=$1
+
+# Get the project directory
+if [ -d $DIR ]; then
+        echo "ERROR: Cluster '$DIR' dir does not exist."
+        exit;
+fi
+
+DATADIR=$DIR/data
+APPSDIR=$DIR/apps
+RESULTSDIR=$DIR/results
 
 SFTREELISTFILE=$DATADIR/superfamilies.gemmatrees.torun.list
 
