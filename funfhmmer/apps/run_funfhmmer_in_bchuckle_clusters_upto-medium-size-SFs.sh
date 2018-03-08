@@ -21,7 +21,8 @@ if [ "$#" -ne 1 ]; then
 	exit;
 fi
 
-$DIR=$1
+DIR=$1
+
 
 # Get the project directory
 if [ -d $DIR ]; then
