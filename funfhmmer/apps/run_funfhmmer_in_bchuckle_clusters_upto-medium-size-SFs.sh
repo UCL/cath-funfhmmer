@@ -25,8 +25,8 @@ DIR=$1
 
 
 # Get the project directory
-if [ -d $DIR ]; then
-        echo "ERROR: Cluster '$DIR' dir does not exist."
+if [ ! -d "$DIR" ]; then
+        echo "ERROR: Cluster dir '$DIR' does not exist for $HOSTNAME $SGE_O_HOST ."
         exit;
 fi
 
