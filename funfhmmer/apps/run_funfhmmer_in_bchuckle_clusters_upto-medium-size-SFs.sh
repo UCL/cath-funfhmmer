@@ -45,7 +45,7 @@ echo "[$time] #Processing  ${superfamily} with ${superfamilytree} TREE.."
 echo ""
 
 # create working temp dir
-SCRATCH_DIR=/scratch0/ucbtdas
+SCRATCH_DIR=/scratch0/`whoami`-funfhmmer
 LOCAL_TMP_DIR=$SCRATCH_DIR/${JOB_ID}_${SGE_TASK_ID}
 
 mkdir -p -v $LOCAL_TMP_DIR
