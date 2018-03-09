@@ -36,7 +36,7 @@ do
  		
 			rsync -arv $GEMMADIR/$superfamily/ $DATADIR/$superfamily/ >> $LOGFILE
 			
-			mv $DATADIR/$superfamily/starting_cluster_alignments/ $DATADIR/$superfamily/funfam_alignments/
+			cp -R $DATADIR/$superfamily/starting_cluster_alignments/ $DATADIR/$superfamily/funfam_alignments/
 				
 			echo "${superfamily}" >> $SFTREELISTFILE
 			
