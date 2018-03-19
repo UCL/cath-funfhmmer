@@ -20,6 +20,8 @@ if [ -f $SFTREELISTFILE ] ; then
 	rm $SFTREELISTFILE
 fi
 
+echo "# Copying GEMMA data for the list of superfamilies to data/ .."
+
 cat $SFLISTFILE | while read superfamilyline
 do
 	stringarray=($superfamilyline)
@@ -30,28 +32,16 @@ do
  	
  		mkdir -p "$DATADIR/$superfamily"
  		
- 		echo "# Copying GEMMA data for the list of superfamilies to data/ .."
- 		
  		if [ -d $GEMMADIR/$superfamily/ ]; then
  		
 			rsync -arv $GEMMADIR/$superfamily/ $DATADIR/$superfamily/ >> $LOGFILE
 			
-			cp -R $DATADIR/$superfamily/starting_cluster_alignments/ $DATADIR/$superfamily/funfam_alignments/
+			echo "# $superfamily copied."
+			
+			mv $DATADIR/$superfamily/starting_cluster_alignments/ $DATADIR/$superfamily/funfam_alignments/
 				
 			echo "${superfamily}" >> $SFTREELISTFILE
-			
-			if [ -s $SFTREELISTFILE ] ; then
-			
-				echo "# Done."
-				fileinfo=$(wc $SFTREELISTFILE)
-				JOBS=$(echo $fileinfo|cut -d' ' -f1)
-				echo ""
-				echo "#** JOBNUM=$JOBS **"
-				echo ""
-				
-			else
-				echo "$SFTREELISTFILE is empty"
-			fi
+	
 		else
 		
 			echo "# ERROR: $GEMMADIR/$superfamily/ directory does not exist."
@@ -64,6 +54,19 @@ do
  	fi
 done
 
+
+if [ -s $SFTREELISTFILE ] ; then
+	
+	echo "# Done."
+	fileinfo=$(wc $SFTREELISTFILE)
+	JOBS=$(echo $fileinfo|cut -d' ' -f1)
+	echo ""
+	echo "#** JOBNUM=$JOBS **"
+	echo ""
+				
+	else
+		echo "$SFTREELISTFILE is empty!"
+	fi
 
 
 
