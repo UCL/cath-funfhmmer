@@ -229,11 +229,29 @@ sub groupsim_rawscores_process_quantitate{
 	my $q3 = $stat->quantile(3);
 	my $max = $stat->quantile(4);
 	
+	my $x1_percent = ($x1/$tot)*100;
+	$x1_percent = sprintf "%.2f", $x1_percent;
+	
+	my $x2_percent = ($x2/$tot)*100;
+	$x2_percent = sprintf "%.2f", $x2_percent;
+	
+	my $x3_percent = ($x3/$tot)*100;
+	$x3_percent = sprintf "%.2f", $x3_percent;
+	
+	my $x4_percent = ($x4/$tot)*100;
+	$x4_percent = sprintf "%.2f", $x4_percent;
+	
+	my $x5_percent = ($x5/$tot)*100;
+	$x5_percent = sprintf "%.2f", $x5_percent;
+	
+	my $none_percent = ($none/$tot)*100;
+	$none_percent = sprintf "%.2f", $none_percent;
+	
 	my $file2 = "$file.quantitate";
 	open(OUTFILE1, ">$file2") or die "Can't open file $file2\n";
 	
 	print OUTFILE1 "#No. of residues more than these Groupsim Scores:\n<=.3\t<=.4\t.4~.7\t.7<.8\t.8=1\tNone\tTot\tq1\tmedian\tq3\n";#
-	print OUTFILE1 "$x1\t$x2\t$x3\t$x4\t$x5\t$none\t$tot\t$q1\t$median\t$q3\n";#
+	print OUTFILE1 "$x1_percent\t$x2_percent\t$x3_percent\t$x4_percent\t$x5_percent\t$none_percent\t$tot\t$q1\t$median\t$q3\n";#
 	
 	close OUTFILE1;
 	close INFILE;

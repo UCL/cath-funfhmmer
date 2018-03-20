@@ -3,6 +3,12 @@
 # execute job from the current working directory
 #$ -cwd
 
+# max runtime
+#$ -l h_rt=1:0:0
+
+# memory requirements
+#$ -l h_vmem=1G,tmem=1G
+
 # merge the stdout and stderr into one file
 #$ -j y
 
@@ -52,12 +58,15 @@ echo "[$time] #Start copying starting clusters of ${superfamily}.."
 #Copy the folder to FFer working dir
 rsync -raz $DATADIR/$superfamily/ $LOCAL_TMP_DIR/$superfamily/
 
+rsync -raz $DATADIR/$superfamily/starting_cluster_alignments/ $LOCAL_TMP_DIR/$superfamily/funfam_alignments/
+
 echo "[$time] #---DONE"
 echo ""
 
 perl $APPSDIR/funfhmmer.pl --sup $superfamily --dir $LOCAL_TMP_DIR/$superfamily --groupsim_matrix id
 
 rm -r $LOCAL_TMP_DIR/$superfamily/merge_node_alignments/
+rm -r $LOCAL_TMP_DIR/$superfamily/starting_cluster_alignments/
 
 echo ""
 echo "[$time] #Copying back generated FunFams for ${superfamily}.."
