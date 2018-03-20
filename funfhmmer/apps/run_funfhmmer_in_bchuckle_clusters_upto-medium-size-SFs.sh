@@ -41,7 +41,7 @@ superfamily=$(cat $SFTREELISTFILE | head -n $SGE_TASK_ID | tail -n 1 | awk '{pri
 time=$(date)
 
 echo ""
-echo "[$time] #Processing  ${superfamily} with ${superfamilytree} TREE.."
+echo "[$time] #Processing  ${superfamily} .."
 echo ""
 
 # create working temp dir
@@ -64,6 +64,18 @@ echo "[$time] #---DONE"
 echo ""
 
 perl $APPSDIR/funfhmmer.pl --sup $superfamily --dir $LOCAL_TMP_DIR/$superfamily --groupsim_matrix id
+
+# funfhmmer.pl Usage:
+
+	#funfhmmer.pl --sup <CATH_superfamily_code> --dir <CATH_superfamily_dir> --groupsim_matrix <id/mc>
+
+	#Options:
+	#--groupsim-matrix	id	Identity matrix
+	#			mc	Mclachlan matrix (Chemical similarity)
+	
+# --groupsim_matrix id means using identity matrix for calculating the groupsim scores. Using Identity matrix, the Groupsim scores are within the range 0-1 where we use scores >=0.7 as a threshold of predicting SDPs.
+	
+# For using --groupsim_matrix mc, that uses Mclaclan matrix,1972 the scoreanalysis subroutine in GSanalysis needs to be written for it. For this, the threshold values of SDP prediction by Groupsim needs to be determined using correlation by plotting groupsim scores calculated using Identity matrix and McLaclan matrix and determing an equivalent threshold.
 
 rm -r $LOCAL_TMP_DIR/$superfamily/merge_node_alignments/
 rm -r $LOCAL_TMP_DIR/$superfamily/starting_cluster_alignments/
