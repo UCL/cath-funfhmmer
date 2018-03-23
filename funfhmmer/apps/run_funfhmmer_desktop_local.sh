@@ -1,7 +1,7 @@
 #!/bin/bash
 
 # Set the FunFHMMer project directory
-DIR=${BCHUCKLE_DIR}
+DIR=${PROJECTHOME}
 DATADIR=$DIR/data
 APPSDIR=$DIR/apps
 RESULTSDIR=$DIR/results

@@ -36,11 +36,11 @@ sub merge_cluster_pair{
 
 	my ($input1, $input2, $output, $dir) = @_;
 	
-	my $inputfile1 = $dir->path("funfam_alignments/$input1.aln");
-	my $inputfile2 = $dir->path("funfam_alignments/$input2.aln");
+	my $inputfile1 = path("$dir/funfam_alignments/$input1.aln");
+	my $inputfile2 = path("$dir/funfam_alignments/$input2.aln");
 	
-	my $outputfile = $dir->path("$output");
-	my $outputfile_aln = $dir->path("funfam_alignments/$output.aln");
+	my $outputfile = path("$dir/$output");
+	my $outputfile_aln = path("$dir/funfam_alignments/$output.aln");
 	
 	system("cat $inputfile1 $inputfile2 > $outputfile");
 	
@@ -56,12 +56,12 @@ sub merge_gs_3{
 
 	my ($input1, $input2, $input3, $output, $dir) = @_;
 	
-	my $inputfile1 = $dir->path("funfam_alignments/$input1.aln");
-	my $inputfile2 = $dir->path("funfam_alignments/$input2.aln");
-	my $inputfile3 = $dir->path("funfam_alignments/$input3.aln");
+	my $inputfile1 = path("$dir/funfam_alignments/$input1.aln");
+	my $inputfile2 = path("$dir/funfam_alignments/$input2.aln");
+	my $inputfile3 = path("$dir/funfam_alignments/$input3.aln");
 	
-	my $outputfile = $dir->path("funfam_alignments/$output");
-	my $outputfile_aln = $dir->path("funfam_alignments/$output.aln");
+	my $outputfile = path("$dir/funfam_alignments/$output");
+	my $outputfile_aln = path("$dir/funfam_alignments/$output.aln");
 	
 	system("cat $inputfile1 $inputfile2 $inputfile3 > $outputfile");
 	
