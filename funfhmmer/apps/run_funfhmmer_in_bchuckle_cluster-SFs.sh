@@ -12,8 +12,11 @@
 # merge the stdout and stderr into one file
 #$ -j y
 
-# stdoutput file pathname
-#$ -o ../job_status
+# stdout file pathname
+#$ -o ../job_status/run_funfhmmer_in_bchuckle_cluster-SFs.job_$JOB_ID.task_$TASK_ID.stdout
+
+# stderr file pathname
+#$ -e ../job_status/run_funfhmmer_in_bchuckle_cluster-SFs.job_$JOB_ID.task_$TASK_ID.stderr
 
 
 if [ "$#" -ne 1 ]; then
