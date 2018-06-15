@@ -40,7 +40,7 @@ my %sc_num =();
 my @superfamilies = $SFLISTFILE->lines;
 
 my $stats_file = "$STATSDIR/STATS.tsv";
-open(STATS, ">$stats_file") or die "Can't open file $stats_file\n";		
+open(STATS, ">$stats_file") or die "Can't open file $stats_file\n";
 print STATS "Superfamily\tTree\ts90s\tFFs\tDopsHi%\ts90s_HighDops%\tSeqNum_HighDops%\tAvgDOPS\tAvgSeqNum\tSingletons%\tFF_withEC\tFF_withEC_not_singleton\tECpurity>80%\tECpurity>90%\tECpurity100%\n";
 
 # add no. of s90s in high DOPS clusters as a percentage of total no. of s90s
@@ -54,7 +54,7 @@ foreach my $SF (@superfamilies){
 	my $SFannofile = path("$ANNODIR/$SF.anno");
 	foreach my $faa (glob("$STARTINGCLUSTERDATA/$SF/*.faa")) {
 		$scnum++;
-		
+
 		my @seqheaders = `LC_ALL=C fgrep ">" $faa`;
 		my @ffids;
 		foreach my $id (@seqheaders){
@@ -62,14 +62,14 @@ foreach my $SF (@superfamilies){
 			my $md5 =$1;
 			push(@ffids, $md5);
 		}
-		
+
 		unless(-e "$SFannofile"){
 			# get list of EC for sequences
-			my $rs = $db->resultset("UniprotToEc")->search( 
-				{ sequence_md5 => \@ffids } 
+			my $rs = $db->resultset("UniprotToEc")->search(
+				{ sequence_md5 => \@ffids }
 			);
-			
-			
+
+
 			while ( my $row = $rs->next ) {
 				my $ffmember = $row->sequence_md5;
 				my $ec = $row->ec_code;
@@ -84,7 +84,7 @@ foreach my $SF (@superfamilies){
 		}
 	}
 	$sc_num{$SF}=$scnum;
-	
+
 	unless(-e "$SFannofile"){
 		open(ANNO, ">$SFannofile") or die "Can't open file $SFannofile\n";
 		foreach my $seq (sort keys %ec_hash){
@@ -101,7 +101,7 @@ foreach my $SF (@superfamilies){
 			$ec_hash{$seq}{$func}=1;
 		}
 	}
-	
+
 	#print Dumper (\%ec_hash);
 	my @sftreelines = `fgrep -w "$SF" $SFTREELISTFILE`;
 	foreach my $sftree (@sftreelines){
@@ -121,17 +121,17 @@ foreach my $SF (@superfamilies){
 			my $p80=0;
 			my $sum_dops = 0;
 			my $sum_seqnum = 0;
-			
+
 			my $sum_s90s_high_dops=0;
 			my $tot_s90s=0;
-			
+
 			my $sum_seqs_high_dops=0;
 			my $tot_seqs=0;
-			
+
 			my $ec_purity_file = "$RESULTSDIR/$SF.$TREE/$SF.$TREE.FF.ECpurity.csv";
 			open(EC_PURITY, ">$ec_purity_file") or die "Can't open file $ec_purity_file\n";
 			print EC_PURITY "FF,purity_percent,MD5swithEC,MD5num\n";
-			
+
 			foreach my $aln (glob("$RESULTSDIR/$SF.$TREE/*.aln")) {
 				$ffnum++;
 				my $alnname = basename($aln,".aln");
@@ -167,7 +167,7 @@ foreach my $SF (@superfamilies){
 				}
 				my %aln_ec_hash=();
 				# get ecs of all ids in aln
-				
+
 				my %md5swithec=();
 				foreach my $ffmd5 (keys %ffids){
 					foreach my $ecanno (keys %{ $ec_hash{$ffmd5} }){
@@ -178,9 +178,9 @@ foreach my $SF (@superfamilies){
 				#print Dumper(\%aln_ec_hash);
 				#exit ;
 				my $uniq_md5_ec= keys %md5swithec;
-				
+
 				my $uniq_ec = keys %aln_ec_hash;
-				
+
 				if($uniq_ec > 0){
 					$ff_ecinfo++;
 				}
@@ -188,7 +188,7 @@ foreach my $SF (@superfamilies){
 					$ff_ecinfo_notsamemd5++;
 
 					foreach my $ecnum (sort {$aln_ec_hash{$b} <=> $aln_ec_hash{$a}} keys %aln_ec_hash){
-						
+
 						my $mostcommon_ECnum_present_in = $aln_ec_hash{$ecnum};
 						my $mostcommon_ECnum_percentage = ($mostcommon_ECnum_present_in/$uniq_md5_ec)*100;
 						#print "$alnname\t$ecnum\t$aln_ec_hash{$ecnum}\t$mostcommon_ECnum_present_in\t$mostcommon_ECnum_percentage\t$seqnum\n";
@@ -208,9 +208,9 @@ foreach my $SF (@superfamilies){
 				#exit;
 				}
 			}
-			
+
 			close EC_PURITY;
-			
+
 			#calculate percentages
 			my $s90_high_dops_percent = ($sum_s90s_high_dops/$tot_s90s)*100;
 			my $seqnum_high_dops_percent = ($sum_seqs_high_dops/$tot_seqs)*100;
@@ -231,19 +231,19 @@ foreach my $SF (@superfamilies){
 			$p90_p = nearest(0.01, $p90_p);
 			my $p100_p = ($p100/$ff_ecinfo_notsamemd5)*100;
 			$p100_p = nearest(0.01, $p100_p);
-			
+
 			#get number of trace lines - this gives how many pairs of clusters were compared to generate the tree
 			my $TRACE= path("$RESULTSDIR/$SF.$TREE/tree.trace");
 			my @trace_lines = $TRACE->lines;
 			my $trace_comparisons = scalar @trace_lines;
-			
+
 			#print stats
 			print STATS "$SF\t$TREE\t$sc_num{$SF}\t$ffnum\t$highdops_ff_p\t$s90_high_dops_percent\t$seqnum_high_dops_percent\t$avg_dops\t$avg_seqnum\t$singletons_p\t$ff_ecinfo_p\t$ff_ecinfo_notsamemd5_p\t$p80_p\t$p90_p\t$p100_p\n";
 			#exit;
 			}
 		}
 	}
-	
+
 }
 
 close STATS;
