@@ -26,27 +26,27 @@ cat $SFLISTFILE | while read superfamilyline
 do
 	stringarray=($superfamilyline)
 	superfamily=${stringarray[0]}
-	GEMMADIR=${stringarray[1]}
-	
+	SUPDIR=${stringarray[1]}
+
  	if [ ! -z $superfamily ]; then
- 	
+
  		mkdir -p "$DATADIR/$superfamily"
+
+ 		if [ -d $SUPDIR/ ]; then
  		
- 		if [ -d $GEMMADIR/$superfamily/ ]; then
- 		
-			rsync -arv $GEMMADIR/$superfamily/ $DATADIR/$superfamily/ >> $LOGFILE
-			
+			rsync -arv $SUPDIR/ $DATADIR/$superfamily/ >> $LOGFILE
+
 			echo "# $superfamily copied."
-				
+
 			echo "${superfamily}" >> $SFTREELISTFILE
-	
+
 		else
-		
-			echo "# ERROR: $GEMMADIR/$superfamily/ directory does not exist."
+
+			echo "# ERROR: $SUPDIR directory does not exist."
 			echo ""
 		fi
  	else
-		
+
 		echo "# ERROR: $SFLISTFILE has no superfamily name."
 		echo ""
  	fi
@@ -54,18 +54,14 @@ done
 
 
 if [ -s $SFTREELISTFILE ] ; then
-	
+
 	echo "# Done."
 	fileinfo=$(wc $SFTREELISTFILE)
 	JOBS=$(echo $fileinfo|cut -d' ' -f1)
 	echo ""
 	echo "#** JOBNUM=$JOBS **"
 	echo ""
-				
+
 	else
 		echo "$SFTREELISTFILE is empty!"
 	fi
-
-
-
-
