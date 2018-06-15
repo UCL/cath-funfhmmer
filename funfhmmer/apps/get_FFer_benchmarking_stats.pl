@@ -18,7 +18,6 @@ my $USAGE = <<"__USAGE__";
 Usage:
 
     perl $0 /cath/people2/ucbtdas/git/myproject/funfhmmer
-		perl $0 $PROJECTHOME
 
 __USAGE__
 
@@ -37,7 +36,7 @@ my $BENCHDIR = $DIR->path("benchmark");
 unless($BENCHDIR->exists){
 	$BENCHDIR->mkpath;
 }
-my $SFLISTFILE= $DATADIR->path("superfamilies.torun.list");
+my $SFLISTFILE= $DATADIR->path("superfamilies.list");
 
 #my $STATSDIR = $DIR->path("stats");
 #unless($STATSDIR->exists){
@@ -55,7 +54,7 @@ my @superfamilies = $SFLISTFILE->lines;
 
 my $stats_file = "$BENCHDIR/STATS.tsv";
 open(STATS, ">$stats_file") or die "Can't open file $stats_file\n";
-print STATS "Superfamily\tTree\ts90s\tFFs\tDopsHi%\ts90s_HighDops%\tSeqNum_HighDops%\tAvgDOPS\tAvgSeqNum\tSingletons%\tFF_withEC\tFF_withEC_not_singleton\tECpurity>80%\tECpurity>90%\tECpurity100%\n";
+print STATS "Superfamily\ts90s\tFFs\tDopsHi%\ts90s_HighDops%\tSeqNum_HighDops%\tAvgDOPS\tAvgSeqNum\tSingletons%\tFF_withEC\tFF_withEC_not_singleton\tECpurity>80%\tECpurity>90%\tECpurity100%\n";
 
 # add no. of s90s in high DOPS clusters as a percentage of total no. of s90s
 # add no. of seqs in high DOPS clusters as a percentage of total no. of seqs
@@ -65,7 +64,7 @@ foreach my $SF (@superfamilies){
 	chomp($SF);
 	print "$SF\n";
 
-	my $STARTINGCLUSTERDATA= $DATADIR->$SF->path("starting_cluster_alignments");
+	my $STARTINGCLUSTERDATA= $DATADIR->path("$SF/starting_cluster_alignments");
 	my $SFannofile = path("$BENCHDIR/$SF.anno");
 
 	my $scnum=0;
@@ -73,6 +72,7 @@ foreach my $SF (@superfamilies){
 	#print "Calculating S90numbers and EC info\n";
 
 	foreach my $aln (glob("$STARTINGCLUSTERDATA/*.aln")) {
+		#print "$aln\n";
 		$scnum++;
 		my @seqheaders = `LC_ALL=C fgrep ">" $aln`;
 		my @ffids;
@@ -139,18 +139,19 @@ foreach my $SF (@superfamilies){
 
 			my $ec_purity_file = "$RESULTSDIR/$SF/$SF.FF.ECpurity.csv";
 			open(EC_PURITY, ">$ec_purity_file") or die "Can't open file $ec_purity_file\n";
-			print EC_PURITY "FF,purity_percent,MD5swithEC,MD5num\n";
+			print EC_PURITY "SF,FF,purity_percent,MD5swithEC,MD5num,DOPS\n";
 
-			foreach my $aln (glob("$RESULTSDIR/$SF/*.aln")) {
+			foreach my $aln (glob("$RESULTSDIR/$SF/funfam_alignments/*.aln")) {
+				#print "$aln\n";
 				$ffnum++;
 				my $alnname = basename($aln,".aln");
 				my @seqheaders = `LC_ALL=C fgrep ">" $aln`;
+
 				my %s90s=();
 				foreach my $header (@seqheaders){
 					chomp($header);
-					$header=~ /\#(\d+)/;
-					my $sc= $1;
-					$s90s{$sc} =1;
+					#print "$header\n";
+					$s90s{$header} =1;
 				}
 				my $s90num = keys %s90s;
 				my $seqnum = scalar @seqheaders;
@@ -158,7 +159,7 @@ foreach my $SF (@superfamilies){
 					$singletons++;
 				}
 				$sum_seqnum=$sum_seqnum+$seqnum;
-				my $aln_dops = Funfhmmer::Scorecons::assign_dops_score($alnname,"$RESULTSDIR/$SF/funfam_alignments/analysis_data");
+				my $aln_dops = Funfhmmer::Scorecons::assign_dops_score($alnname,"$RESULTSDIR/$SF");
 				if($aln_dops >= 70){
 					$highdops_ff++;
 					$sum_seqs_high_dops = $sum_seqs_high_dops + $seqnum;
@@ -201,7 +202,7 @@ foreach my $SF (@superfamilies){
 						my $mostcommon_ECnum_present_in = $aln_ec_hash{$ecnum};
 						my $mostcommon_ECnum_percentage = ($mostcommon_ECnum_present_in/$uniq_md5_ec)*100;
 						#print "$alnname\t$ecnum\t$aln_ec_hash{$ecnum}\t$mostcommon_ECnum_present_in\t$mostcommon_ECnum_percentage\t$seqnum\n";
-						print EC_PURITY "$alnname,$mostcommon_ECnum_percentage,$uniq_md5_ec,$seqnum,$aln_dops\n";
+						print EC_PURITY "$SF,$alnname,$mostcommon_ECnum_percentage,$uniq_md5_ec,$seqnum,$aln_dops\n";
 						#print "$alnname,$mostcommon_ECnum_percentage,$uniq_md5_ec,$seqnum\n";
 						if($mostcommon_ECnum_percentage == 100 ){
 							$p100++;
@@ -248,6 +249,7 @@ foreach my $SF (@superfamilies){
 
 			#print stats
 			print STATS "$SF\t$sc_num{$SF}\t$ffnum\t$highdops_ff_p\t$s90_high_dops_percent\t$seqnum_high_dops_percent\t$avg_dops\t$avg_seqnum\t$singletons_p\t$ff_ecinfo_p\t$ff_ecinfo_notsamemd5_p\t$p80_p\t$p90_p\t$p100_p\n";
+
 			#exit;
 }
 
