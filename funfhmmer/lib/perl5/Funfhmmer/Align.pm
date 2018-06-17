@@ -35,7 +35,7 @@ sub generate_clusterfaa_align{
 
 sub generate_catcluster_align{
 	my ($input_path, $output_path) = @_;
-	if(!-e "$output_path" || -z "$output_path"){ 
+	if(!-e "$output_path" || -z "$output_path"){
 		&align($input_path, $output_path);
 		&check_align($input_path, $output_path);
 	}
@@ -59,14 +59,14 @@ sub check_align{
 sub align{
 	my ($cluster_faa, $cluster_aln) = @_;
 	my $bindir = path( $FindBin::Bin, "..", "bin" );
-	my $cdhit = path("$bindir/cdhit-master","cdhit");
+	my $cdhit = path("$bindir/cdhit-master","cd-hit");
 	my $mafft = path("$bindir/mafft-linux64","mafft.bat");
-	
-	
+
+
 	my $seqnumber = `grep -c '>' $cluster_faa`;
 	chomp($seqnumber);
-	
-	if($seqnumber == 1){   
+
+	if($seqnumber == 1){
 		rename("$cluster_faa", "$cluster_aln");
 	}
 	else {	#####
@@ -94,10 +94,10 @@ sub align{
 			rename("$cluster_faa.cd", "$cluster_faa");
 			unlink("$cluster_faa.cd.clstr");
 		}
-		#####		
-		# Align sequences using MAFFT 
 		#####
-		if($seqnumber >= 2 && $seqnumber <= 500){ 
+		# Align sequences using MAFFT
+		#####
+		if($seqnumber >= 2 && $seqnumber <= 500){
 			system("$mafft --anysymbol --amino --quiet --localpair --maxiterate 1000 $cluster_faa > $cluster_aln");
 		}
 		elsif($seqnumber >= 501 && $seqnumber <= 2000){
