@@ -142,11 +142,11 @@ my $evalthresh_gs_start = $evalthresh_q1;
 #####
 # Start a LOG
 #####
-
+my $LOG_LEVEL= 'info' ;
 my $LOG = Log::Dispatch->new(
   outputs => [
-#    [ 'Screen', min_level => $LOG_LEVEL, stderr => 0, newline => 0 ],
-#    [ 'Screen', min_level => 'warning', stderr => 1, newline => 1 ],
+    [ 'Screen', min_level => $LOG_LEVEL, stderr => 0, newline => 0 ],
+    [ 'Screen', min_level => 'warning', stderr => 1, newline => 1 ],
     [ 'File', min_level => 'debug', filename => "$dir/$superfamily.LOG" ],
   ],
   callbacks => sub {
@@ -197,19 +197,6 @@ foreach (@merges){
 
 	my ($node1, $node2, $merge_node, $evalue) = @{$_};
 
-	if( $evalue > 0.001 ){
-
-		# Keep nodes separate when E-values > 0.001
-
-		$not_merged_list{$merge_node} = [$node1, $node2];
-
-		$LOG->info( "$node1\t$node2\t$merge_node\t$evalue\thigh_Evalue\tnomerge-E>0.001" );
-		
-		$auto_merge_low_evalues = 0;
-
-		next;
-	}
-
 	my $node1_aln = $funfam_dir->path("$node1.aln");
 	my $node2_aln = $funfam_dir->path("$node2.aln");
 
@@ -226,7 +213,7 @@ foreach (@merges){
 			next;
 		}
 		else{
-			
+
 			# For higher Evalues (from $evalthresh_gs_start to $evalthresh_q3), we need to use Groupsim. Use DOPS of the clusters to check MSA of clusters are informative enough - choose GS score analysis method accordingly
 
 			my $node1_dops = Funfhmmer::Scorecons::assign_dops_score($node1, $dir);
@@ -257,7 +244,7 @@ foreach (@merges){
 			}
 
 			$auto_merge_low_evalues = 0;
-			
+
 			next;
 		}
 	}
@@ -292,7 +279,7 @@ foreach (@merges){
 					next;
 				}
 			}
-			
+
 			$auto_merge_low_evalues = 0;
 
 		}
@@ -334,7 +321,7 @@ foreach my $sc (glob("$sc_dir/*.aln")) {
     chomp($header);
     $header=~ s/\>//g;
     $sc_seq_hash{$header} = $sc_name;
-    
+
   }
 }
 
@@ -354,35 +341,35 @@ open(FUNFAM_SC_MD5_LIST, ">$funfam_sc_seq_list") or die "Can't open file $funfam
 print FUNFAM_SC_MD5_LIST "#FUNFAM\tSEQ_MD5\tSTARTING_CLUSTER\n";
 
 foreach my $funfam_file (glob("$funfam_dir/*.aln")) {
-  
+
   chomp($funfam_file);
   my $funfam_name = basename($funfam_file, ".aln");
   my @ffheaders = `fgrep ">" $funfam_file`;
-  
+
   my %clusters = ();
-  
+
   foreach my $header (@ffheaders){
-    
+
     chomp($header);
     $header=~ s/\>//g;
     my $sc =  $sc_seq_hash{$header};
-    
-    
+
+
     if($sc){
-	
+
 	$clusters{$sc}=1;
-	
+
     }
-    
+
     print FUNFAM_SC_MD5_LIST "$funfam_name\t$header\t$sc\n";
   }
-  
+
   foreach my $cl (sort keys %clusters){
-    
+
     print FUNFAM_SC "$cl ";
-    
+
   }
-  
+
   print FUNFAM_SC "\n";
   print FUNFAM_LIST "$funfam_name\n";
 
@@ -430,7 +417,7 @@ sub check_if_child_nodes_exist{
 	elsif ($not_merged_ignorenextones{$node1} || $not_merged_ignorenextones{$node2}){
 
 		$not_merged_ignorenextones{$merge_node} = [$node1, $node2];
-		$LOG->info( "$node1\t$node2\t$merge_node\t$evalue\tGS\tnomerge-none_merged_nefore" );
+		$LOG->info( "$node1\t$node2\t$merge_node\t$evalue\tGS\tnomerge-none_merged_before" );
 
 		$node_alns_state = 0;
 

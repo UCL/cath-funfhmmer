@@ -64,7 +64,7 @@ sub groupsim_identity_matrix{
 	my $analysis_subfoldername = "analysis_data";
 	
 	unless(-e "$gs_file"){
-		
+	        #print "$grp1 $grp2\n";	
 		system ("python2 $bindir/groupsim/group_sim_sdp.py -c 0.3 -g 0.5 $align $grp1 $grp2 > $gs_rawfile");
 		
 		if (-z "$gs_rawfile"){

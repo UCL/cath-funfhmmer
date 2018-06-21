@@ -4,10 +4,10 @@
 #$ -cwd
 
 # max runtime
-#$ -l h_rt=1:0:0
+#$ -l h_rt=10:0:0
 
 # memory requirements
-#$ -l h_vmem=1G,tmem=1G
+#$ -l h_vmem=7G,tmem=7G
 
 # merge the stdout and stderr into one file
 #$ -j y
@@ -66,7 +66,9 @@ rsync -raz $DATADIR/$superfamily/starting_cluster_alignments/ $LOCAL_TMP_DIR/$su
 echo "[$time] #---DONE"
 echo ""
 
-perl $APPSDIR/funfhmmer.pl --sup $superfamily --dir $LOCAL_TMP_DIR/$superfamily --groupsim_matrix id
+echo "[time] #Start generating FunFams"
+
+perl $APPSDIR/funfhmmer.pl --sup $superfamily --dir $LOCAL_TMP_DIR/$superfamily --groupsim_matrix id 1> $LOCAL_TMP_DIR/$superfamily/funfhmmer.stdout 2> $LOCAL_TMP_DIR/$superfamily/funfhmmer.stderr   
 
 # funfhmmer.pl Usage:
 
@@ -79,6 +81,8 @@ perl $APPSDIR/funfhmmer.pl --sup $superfamily --dir $LOCAL_TMP_DIR/$superfamily 
 # --groupsim_matrix id means using identity matrix for calculating the groupsim scores. Using Identity matrix, the Groupsim scores are within the range 0-1 where we use scores >=0.7 as a threshold of predicting SDPs.
 	
 # For using --groupsim_matrix mc, that uses Mclaclan matrix,1972 the scoreanalysis subroutine in GSanalysis needs to be written for it. For this, the threshold values of SDP prediction by Groupsim needs to be determined using correlation by plotting groupsim scores calculated using Identity matrix and McLaclan matrix and determing an equivalent threshold.
+
+echo "[time] #Finished generating FunFams.."
 
 rm -r $LOCAL_TMP_DIR/$superfamily/merge_node_alignments/
 rm -r $LOCAL_TMP_DIR/$superfamily/starting_cluster_alignments/

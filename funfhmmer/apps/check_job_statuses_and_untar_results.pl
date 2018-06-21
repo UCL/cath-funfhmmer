@@ -14,7 +14,7 @@ for file in `find $RESULTS -name "*.tar.gz"`
 do
 	SF=`basename $file .tar.gz`
 	echo "Checking $SF results:"
-	tar -xvzf $file -C $RESULTS
+	tar -xzf $file -C $RESULTS
   for f in $RESULTS/$SF/* $RESULTS/$SF/funfam_alignments/* $RESULTS/$SF/funfam_alignments/analysis_data/* ;
   do
     if [ -s $f ] ; then

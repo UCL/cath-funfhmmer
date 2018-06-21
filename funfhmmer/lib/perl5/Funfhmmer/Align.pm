@@ -73,6 +73,7 @@ sub align{
 		# If the clusters are very big, run cd-hit on the cluster sequences to reduce processing time
 		#####
 		my $cdhit_operation = 0;
+=head
 		if($seqnumber > 3000 && $seqnumber < 10000){
 			#####
 			# make 1.aln -> 1.cd.aln after removing non-redundant sequences
@@ -94,6 +95,7 @@ sub align{
 			rename("$cluster_faa.cd", "$cluster_faa");
 			unlink("$cluster_faa.cd.clstr");
 		}
+=cut
 		#####
 		# Align sequences using MAFFT
 		#####
