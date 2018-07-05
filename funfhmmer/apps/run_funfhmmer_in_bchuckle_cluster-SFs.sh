@@ -3,12 +3,6 @@
 # execute job from the current working directory
 #$ -cwd
 
-# max runtime
-#$ -l h_rt=10:0:0
-
-# memory requirements
-#$ -l h_vmem=7G,tmem=7G
-
 # merge the stdout and stderr into one file
 #$ -j y
 
