@@ -54,6 +54,8 @@ mkdir -p -v $LOCAL_TMP_DIR
 	
 cd $LOCAL_TMP_DIR
 
+time=$(date)
+
 echo ""
 echo "[$time] #Start copying starting clusters of ${superfamily}.."
 
@@ -62,10 +64,12 @@ rsync -raz $DATADIR/$superfamily/ $LOCAL_TMP_DIR/$superfamily/
 
 rsync -raz $DATADIR/$superfamily/starting_cluster_alignments/ $LOCAL_TMP_DIR/$superfamily/funfam_alignments/
 
+time=$(date)
 echo "[$time] #---DONE"
 echo ""
 
-echo "[time] #Start generating FunFams"
+time=$(date)
+echo "[$time] #Start generating FunFams"
 
 perl $APPSDIR/funfhmmer.pl --sup $superfamily --dir $LOCAL_TMP_DIR/$superfamily --groupsim_matrix id 1> $LOCAL_TMP_DIR/$superfamily/funfhmmer.stdout 2> $LOCAL_TMP_DIR/$superfamily/funfhmmer.stderr   
 
@@ -75,7 +79,7 @@ perl $APPSDIR/funfhmmer.pl --sup $superfamily --dir $LOCAL_TMP_DIR/$superfamily 
 
 	#Options:
 	#--groupsim-matrix	id	Identity matrix
-	#			mc	Mclachlan matrix (Chemical similarity)
+	#		            mc	Mclachlan matrix (Chemical similarity)
 	
 # --groupsim_matrix id means using identity matrix for calculating the groupsim scores. Using Identity matrix, the Groupsim scores are within the range 0-1 where we use scores >=0.7 as a threshold of predicting SDPs.
 	
