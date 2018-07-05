@@ -177,7 +177,7 @@ sub print_to_file{
   
   my $sf_count=0;
   
-  foreach my $sf (keys %hash){
+  foreach my $sf (sort keys %hash){
     
     print OUTFILE "$sf\t$hash{$sf}\n";
     $sf_count++;
