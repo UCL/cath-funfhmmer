@@ -85,20 +85,37 @@ perl $APPSDIR/funfhmmer.pl --sup $superfamily --dir $LOCAL_TMP_DIR/$superfamily 
 	
 # For using --groupsim_matrix mc, that uses Mclaclan matrix,1972 the scoreanalysis subroutine in GSanalysis needs to be written for it. For this, the threshold values of SDP prediction by Groupsim needs to be determined using correlation by plotting groupsim scores calculated using Identity matrix and McLaclan matrix and determing an equivalent threshold.
 
-echo "[time] #Finished generating FunFams.."
+SUP_RUN_LOG=$LOCAL_TMP_DIR/$superfamily/$superfamily.LOG
 
-rm -r $LOCAL_TMP_DIR/$superfamily/merge_node_alignments/
-rm -r $LOCAL_TMP_DIR/$superfamily/starting_cluster_alignments/
+if grep -Fwq "hours" $SUP_RUN_LOG; then
+    
+    time=$(date)
+    echo "[$time] #Finished generating FunFams.."
+    
+    rm -r $LOCAL_TMP_DIR/$superfamily/merge_node_alignments/
+    rm -r $LOCAL_TMP_DIR/$superfamily/starting_cluster_alignments/
 
-echo ""
-echo "[$time] #Copying back generated FunFams for ${superfamily}.."
+    echo ""
+    time=$(date)
+    echo "[$time] #Copying back generated FunFams for ${superfamily}.."
 
-#Tar the FunFams from the scratch dir and copy them back to home directory
-SFTREE_FUNFAMS_TAR=$superfamily.tar.gz
+    #Tar the FunFams from the scratch dir and copy them back to home directory
+    SFTREE_FUNFAMS_TAR=$superfamily.tar.gz
 
-tar -zcf $SFTREE_FUNFAMS_TAR -C $LOCAL_TMP_DIR .
-cp $SFTREE_FUNFAMS_TAR $RESULTSDIR/$superfamily.tar.gz
+    tar -zcf $SFTREE_FUNFAMS_TAR -C $LOCAL_TMP_DIR .
+    cp $SFTREE_FUNFAMS_TAR $RESULTSDIR/$superfamily.tar.gz
 
-echo ""
-echo "[$time] #JOB COMPLETE for ${superfamily}."
-echo ""
+    echo ""
+    time=$(date)
+    echo "[$time] #JOB COMPLETE for ${superfamily}."
+    echo ""
+    
+else
+    
+    echo
+    time=$(date)
+    echo "[$time] #FunFam generation was NOT complete for ${superfamily}"
+    echo $superfamily >> $REDO_SUPS
+    echo ""
+    
+fi
