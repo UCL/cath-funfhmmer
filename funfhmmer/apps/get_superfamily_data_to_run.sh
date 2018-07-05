@@ -4,11 +4,10 @@
 DIR=${PROJECTHOME}
 DATADIR=$DIR/data
 APPSDIR=$DIR/apps
-SFLISTFILE=$DATADIR/superfamilies.torun.list
-LOGFILE=$DATADIR/copyingSFdata.rsynclogfile
-SFTREELISTFILE=$DATADIR/superfamilies.list
 
-echo ""
+SFLISTFILE=${SUPLIST}
+
+LOGFILE=$DATADIR/copyingSFdata.rsynclogfile
 
 if [ ! -s $SFLISTFILE ] ; then
 	echo "ERROR: $SFLISTFILE does not exist or is empty."
@@ -16,11 +15,11 @@ if [ ! -s $SFLISTFILE ] ; then
 	exit;
 fi
 
-if [ -f $SFTREELISTFILE ] ; then
-	rm $SFTREELISTFILE
+if [ -f $LOGFILE ] ; then
+	rm $LOGFILE
 fi
 
-echo "# Copying GEMMA data for the list of superfamilies to data/ .."
+echo "# Copying GEMMA data for the list of superfamilies ($SFLISTFILE) to data/.."
 
 cat $SFLISTFILE | while read superfamilyline
 do
@@ -37,8 +36,6 @@ do
 			rsync -av $GEMMADIR/ $DATADIR/$superfamily/ >> $LOGFILE
 			
 			echo "# $superfamily copied."
-				
-			echo "${superfamily}" >> $SFTREELISTFILE
 	
 		else
 		
@@ -53,17 +50,18 @@ do
 done
 
 
-if [ -s $SFTREELISTFILE ] ; then
+if [ -s $SFLISTFILE ] ; then
 	
 	echo "# Done."
-	fileinfo=$(wc $SFTREELISTFILE)
-	JOBS=$(echo $fileinfo|cut -d' ' -f1)
+	fileinfo=$(wc $SFLISTFILE)
+    #echo "$fileinfo"
+	JOBS=$(echo $fileinfo | cut -d' ' -f1)
 	echo ""
 	echo "#** JOBNUM=$JOBS **"
 	echo ""
 				
 	else
-		echo "$SFTREELISTFILE is empty!"
+		echo "$SFLISTFILE is empty!"
 	fi
 
 
