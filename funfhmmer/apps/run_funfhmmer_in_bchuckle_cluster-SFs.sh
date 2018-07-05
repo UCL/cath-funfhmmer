@@ -13,13 +13,13 @@
 #$ -e ../job_status/run_funfhmmer_in_bchuckle_cluster-SFs.job_$JOB_ID.task_$TASK_ID.stderr
 
 
-if [ "$#" -ne 1 ]; then
+if [ "$#" -ne 2 ]; then
 	echo "ERROR: Cluster dirname has not been passed, received $# arguments";
 	exit;
 fi
 
 DIR=$1
-
+SFLISTFILE=$2
 
 # Get the project directory
 if [ ! -d "$DIR" ]; then
@@ -31,10 +31,15 @@ DATADIR=$DIR/data
 APPSDIR=$DIR/apps
 RESULTSDIR=$DIR/results
 
-SFTREELISTFILE=$DATADIR/superfamilies.list
+REDO_SUPS=$RESULTSDIR/REDO_SUPS.$JOB_ID.list
 
-superfamily=$(cat $SFTREELISTFILE | head -n $SGE_TASK_ID | tail -n 1 | awk '{printf $1}')
-	
+superfamily=$(cat $SFLISTFILE | head -n $SGE_TASK_ID | tail -n 1 | awk '{printf $1}')
+
+if [ -z "$var" ]; then
+    echo "ERROR: superfamily name is empty!"
+    exit;
+fi
+
 time=$(date)
 
 echo ""
