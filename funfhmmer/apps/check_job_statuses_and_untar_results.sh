@@ -5,6 +5,13 @@ RESULTS=${PROJECTHOME}/results
 JOB_STATUS=${PROJECTHOME}/job_status
 #SCRIPTNAME="run_funfhmmer_in_bchuckle_cluster-SFs."
 
+if [ "$#" -ne 1 ]; then
+	echo "ERROR: No script log name has not been passed, received $# arguments";
+	exit;
+fi
+
+CHECK_TARS_LOG=$1
+
 echo ""
 echo "Untarring and checking the result folders:"
 echo ""
@@ -16,6 +23,7 @@ do
 	SF=`basename $file .tar.gz`
 	
 	echo "Checking $SF:"
+    
 	tar -xzf $file -C $RESULTS/
 	echo "- Finished extracting $SF"
 	 
@@ -26,6 +34,7 @@ do
 			#echo "$f"
    			if [[ ! $f =~ \.stderr$ ]]; then
     				echo "- ERROR in $SF: $f is EMPTY!"
+                    echo "$SF: ERROR - $f is EMPTY " >> $CHECK_TARS_LOG
     			fi
 		fi
   	done
@@ -40,8 +49,10 @@ do
     		
     		if [ $check_lastline == "hours" ] ; then
       			echo "- $SF was COMPLETE ($hours hours)"
+                echo "$SF: COMPLETE - $hours hours " >> $CHECK_TARS_LOG
 		else
 			echo "- ERROR in $SF: $SF is INCOMPLETE"
+            echo "$SF: ERROR - $SF is INCOMPLETE " >> $CHECK_TARS_LOG
     		fi
   	fi
 done
