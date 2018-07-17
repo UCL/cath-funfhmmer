@@ -5,7 +5,12 @@ DIR=${PROJECTHOME}
 DATADIR=$DIR/data
 APPSDIR=$DIR/apps
 
-SFLISTFILE=${SUPLIST}
+if [ "$#" -ne 1 ]; then
+	echo "ERROR: Superfamily List to run has not been passed, received $# arguments";
+	exit;
+fi
+
+SFLISTFILE=$1
 
 LOGFILE=$DATADIR/copyingSFdata.rsynclogfile
 
