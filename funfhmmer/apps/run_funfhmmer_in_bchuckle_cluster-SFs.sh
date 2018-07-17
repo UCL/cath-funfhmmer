@@ -35,7 +35,7 @@ REDO_SUPS=$RESULTSDIR/REDO_SUPS.$JOB_ID.list
 
 superfamily=$(cat $SFLISTFILE | head -n $SGE_TASK_ID | tail -n 1 | awk '{printf $1}')
 
-if [ -z "$var" ]; then
+if [ -z "$superfamily" ]; then
     echo "ERROR: superfamily name is empty!"
     exit;
 fi
