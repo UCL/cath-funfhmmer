@@ -11,11 +11,13 @@ Usage:
 
     $0 <Dir path with GeMMA result folders>
 
-    E.g. $0 /cath/people2/ucbtdas/GeMMA/v4_2_0_trees/hhsearch_branch_local_nocache_96test ../data
+    E.g. $0 /export/sayoni/funfhmmer_v4_2_0/data/4711_local_run ../data
 
     This script takes the path of the GeMMA result folders and checks the GeMMA trace files 
     It also classiffies them into categories based on #starting clusters and allocates
     time/memory requirements for running in bchuckle.
+    
+    NOTE: this script only analyses the folder 'simple_ordering.hhconsensus.windowed' 
     
     Output files:
     
@@ -51,7 +53,7 @@ open(TRACE_CHECK, ">$trace_checkfile") or die "Can't open file $trace_checkfile\
 
 my $count=0;
 
-foreach my $file (glob("$dir/*/*/tree.trace")) {
+foreach my $file (glob("$dir/*/simple_ordering.hhconsensus.windowed/tree.trace")) {
     
     $count++;
     my $file_shortname = $file;
