@@ -63,16 +63,35 @@ sub groupsim_identity_matrix{
 	
 	my $analysis_subfoldername = "analysis_data";
 	
-	unless(-e "$gs_file"){
-	        #print "$grp1 $grp2\n";	
+	if(!-e "$gs_file" || -z "$gs_file"){
+	    
+		# print "$grp1 $grp2\n";
+		# Based on the number of sequences in the alignment, the c and g parameters have to be different to prevent empty files.
+		# Add these conditions properly later after testing
+		
 		system ("python2 $bindir/groupsim/group_sim_sdp.py -c 0.3 -g 0.5 $align $grp1 $grp2 > $gs_rawfile");
 		
+		if (-z "$gs_rawfile"){
+			
+			system("python2 $bindir/groupsim/group_sim_sdp.py $align $grp1 $grp2 > $gs_rawfile");
+			
+		}
 		if (-z "$gs_rawfile"){
 			
 			system ("python2 $bindir/groupsim/group_sim_sdp_without_cons.py -c 0.3 -g 0.5 $align $grp1 $grp2 > $gs_rawfile");
 		
 		}
+		if (-z "$gs_rawfile"){
+			
+			system ("python2 $bindir/groupsim/group_sim_sdp_without_cons.py $align $grp1 $grp2 > $gs_rawfile");
 		
+		}
+		if (-z "$gs_rawfile") {
+            
+			print "ERROR:EMPTY $gs_rawfile generated.\n";
+			exit 0;
+        }
+        
 		&groupsim_rawscores_process_quantitate($gs_rawfile);
 		
 		unlink($gs_rawfile);
