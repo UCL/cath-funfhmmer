@@ -45,12 +45,14 @@ my $USAGE = <<"__USAGE__";
 
 Usage:
 
-    $0 --sup <CATH_superfamily_code> --dir <CATH_superfamily_dir> --groupsim_matrix <id/mc>
+    $0 --sup <CATH_superfamily_code> --dir <CATH_superfamily_dir> --groupsim_matrix <id/mc> --gs_eval <no; default:q1 of e-val range in trace>
 
     Options:
-    --groupsim-matrix	id	Identity matrix
-			mc	Mclachlan matrix (Chemical similarity)
+    --groupsim_matrix	id		Identity matrix
+			mc		Mclachlan matrix (Chemical similarity)
 
+    --gs_eval		default 	1st quartile of trace E-value range
+			no		Do not use any E-value threshold
     Input in <CATH_superfamily_dir>:
 
     tree.trace
@@ -73,10 +75,12 @@ if (! scalar @ARGV) {
 my $wd;
 my $superfamily;
 my $groupsim_matrix;
+my $gs_eval;
 
 GetOptions (    "sup=s"  => \$superfamily,    # string
 		"dir=s"  => \$wd,    # string
 		"groupsim_matrix=s" => \$groupsim_matrix,
+		"gs_eval=s" => \$gs_eval,
 	    )
 	    or die("Error in command line arguments\n");
 
@@ -86,15 +90,20 @@ die "! ERROR: Input dir '$wd' does not exist\n"
 die "! ERROR: groupsim_matrix (input given:'$groupsim_matrix') should be either 'id' or 'mc'\n"
   unless($groupsim_matrix eq "id" || $groupsim_matrix eq "mc");
 
+
 #####
 # Specify the FunFam and trace directory paths:
 #####
+
 
 our $dir = path("$wd")->absolute;
 unless($dir->exists){
 	print "ERROR: superfamily tree dir does not exist.\n";
 	exit 0;
 }
+
+print "wd:  $wd\nsuperfamily: $superfamily\ngroupsim_matrix: $groupsim_matrix\ngs_eval: $gs_eval\n";
+
 
 my $start_run = time();
 
@@ -122,12 +131,14 @@ foreach my $traceline (@tracelines){
 	my ($node1, $node2, $c3, $eval) = split("\t", $traceline);
 	push(@evalues, $eval);
 }
+
+
 my $stat = Statistics::Descriptive::Full->new();
 $stat->add_data(@evalues);
 my $evalthresh_q1 = $stat->quantile(1);
 my $evalthresh_q3 = $stat->quantile(3);
 
-
+my $evalthresh_gs_start=$evalthresh_q1;
 
 #####
 # #NOTE
@@ -137,7 +148,18 @@ my $evalthresh_q3 = $stat->quantile(3);
 # Higher percentile values can lead to functionally impure clusters being merged
 #####
 
-my $evalthresh_gs_start = $evalthresh_q1;
+my $auto_merge_low_evalues;
+
+if($gs_eval){
+	if($gs_eval eq "no"){
+		$auto_merge_low_evalues = 0; # do not automerge, use GS analyses for the cluster pairs in tracefile
+	}
+}
+else{
+
+	$auto_merge_low_evalues = 1;
+}
+
 
 #####
 # Start a LOG
@@ -162,7 +184,9 @@ $LOG->info( "# Processing $superfamily" );
 $LOG->info( "# Starting FunFHMMer protocol" );
 $LOG->info( "# Groupsim-matrix used: $groupsim_matrix" );
 $LOG->info( "# Evalue-GS_start:$evalthresh_gs_start\tEvalue-Q3:$evalthresh_q3" );
+$LOG->info( "# Auto_merge_low_evalues: $auto_merge_low_evalues" );
 $LOG->info( "#" );
+
 #####
 # Declare variables used in the script
 #####
@@ -188,7 +212,7 @@ while (<$TRACE>){
 }
 close $TRACE;
 
-my $auto_merge_low_evalues = 1;
+
 
 #####
 # For each pair of clusters analysed in the trace file in order

@@ -13,17 +13,16 @@ use Funfhmmer::Scorecons;
 use List::Util;
 use Math::Round;
 
-my $USAGE = <<"__USAGE__";
+my $USAGE = <<"__USAGE__"; 
 
 Usage:
     
-    perl $0 <CATH_version> <PROJECT_DIR> <LIST NAME> <uniprot annotation: SP/ALL>
-    perl $0 4.2 /cath/people2/ucbtdas/git/myproject/funfhmmer superfamilies.small.torun.list ALL
-    perl $0 4.2 /cath/people2/ucbtdas/git/myproject/funfhmmer superfamilies.small.torun.list SP
+    perl $0 <CATH_version> <PROJECT_DIR> <LIST NAME> <uniprot annotation: SP/ALL> <FORCE GET LATEST ECANNO (Y/N)>
+    perl $0 4.2 /cath/people2/ucbtdas/git/ffer_test/funfhmmer /export/sayoni/funfhmmer_v4_2_0/kinase_list SP Y
 
 __USAGE__
 
-if(scalar @ARGV !=4) {
+if(scalar @ARGV !=5) {
 	print $USAGE;
 	exit;
 }
@@ -32,20 +31,22 @@ my $cath_version = $ARGV[0];
 my $dirpath  = $ARGV[1];
 my $listname = $ARGV[2];
 my $anno_type = $ARGV[3];
+my $force_get_latest_annotation= $ARGV[4];
 
 chomp($dirpath);
 chomp($listname);
 
 my $DIR= path("$dirpath");
-my $DATADIR= $DIR->child("data");
 my $APPSDIR= $DIR->child("apps");
+my $DATADIR= $DIR->child("data");
 my $RESULTSDIR= $DIR->child("results");
-my $BENCHDIR = $DIR->path("benchmark");
+my $BENCHDIR = $DIR->child("benchmarking");
+
 unless($BENCHDIR->exists){
 	$BENCHDIR->mkpath;
 }
 
-my $SFLISTFILE= $DATADIR->path("$listname");
+my $SFLISTFILE= path("$listname");
 
 # connect to the database
 my $db = Cath::Schema::Biomap->connect_by_version("$cath_version");
@@ -54,7 +55,7 @@ my $db = Cath::Schema::Biomap->connect_by_version("$cath_version");
 my %sc_num =();
 my @superfamily_lines=$SFLISTFILE->lines;
 
-my $stats_file = "$BENCHDIR/$listname.STATS.$anno_type.tsv";
+my $stats_file = "$listname.STATS.$anno_type.tsv";
 open(STATS, ">$stats_file") or die "Can't open file $stats_file\n";
 print STATS "Superfamily\ts90s\tFFs\tDopsHi%\ts90s_HighDops%\tSeqNum_HighDops%\tAvgDOPS\tAvgSeqNum\tSingletons%\tFF_withEC%\tECpurity>80%\tECpurity>90%\tECpurity100%\n";
 
@@ -64,7 +65,7 @@ print STATS "Superfamily\ts90s\tFFs\tDopsHi%\ts90s_HighDops%\tSeqNum_HighDops%\t
 foreach my $line (@superfamily_lines){
     
     chomp($line);
-    my ($SF, $SF_path) = split("\t", $line);
+    my $SF = $line;
 	
     print "$SF\n";
     
@@ -74,9 +75,9 @@ foreach my $line (@superfamily_lines){
     }
     
     my $scnum=0;
-	my %sf_hash=();
+    my %sf_hash=();
 
-    my $STARTINGCLUSTERDATA= $DATADIR->path("$SF/starting_cluster_alignments");
+    my $STARTINGCLUSTERDATA= $DATADIR->path("$SF/simple_ordering.hhconsensus.windowed/starting_cluster_alignments");
     my $SFannofile = path("$SFBENCHDIR/$SF.md5.uniprot.ec.anno");
 
     #get SF annotations
@@ -96,14 +97,14 @@ foreach my $line (@superfamily_lines){
         
                 foreach my $id (@seqheaders){
                     
-                    $id=~/\>(\w+)\//;
+                    $id=~/\>(\w+)/;
                     my $md5 =$1;
                     #print "$md5\n";
                     $ids{$md5}=1;
                     
                 }
         }
-    if(-z "$SFannofile" || ! -e "$SFannofile"){
+    if(-z "$SFannofile" || ! -e "$SFannofile" || $force_get_latest_annotation eq "Y"){
         
         my @ffids;
         foreach my $seq (keys %ids){
@@ -218,7 +219,7 @@ foreach my $line (@superfamily_lines){
 				$p80++;
 			}
 		}
-        #exit 0;
+        exit 0;
     }
       
     close EC_PURITY;
@@ -227,7 +228,7 @@ foreach my $line (@superfamily_lines){
         
 	my $s90_high_dops_percent = ($sum_s90s_high_dops/$tot_s90s)*100;
 	my $seqnum_high_dops_percent = ($sum_seqs_high_dops/$tot_seqs)*100;
-    my $avg_dops = $sum_dops/$ffnum;
+        my $avg_dops = $sum_dops/$ffnum;
 	my $avg_seqnum = $sum_seqnum/$ffnum;
 	my $highdops_ff_p = ($highdops_ff/$ffnum)*100;
 	$highdops_ff_p = nearest(0.01, $highdops_ff_p);
@@ -283,7 +284,7 @@ sub get_ec_purity{
 
     foreach my $id (@seqheaders){
         
-        $id=~/\>(\w+)\//;
+        $id=~/\>(\w+)/;
         my $md5 =$1;
         $ffids{$md5}=1;
     

@@ -71,7 +71,7 @@ echo ""
 time=$(date)
 echo "[$time] #Start generating FunFams"
 
-perl $APPSDIR/funfhmmer.pl --sup $superfamily --dir $LOCAL_TMP_DIR/$superfamily --groupsim_matrix id 1> $LOCAL_TMP_DIR/$superfamily/funfhmmer.stdout 2> $LOCAL_TMP_DIR/$superfamily/funfhmmer.stderr   
+perl $APPSDIR/funfhmmer_eval_test.pl --sup $superfamily --dir $LOCAL_TMP_DIR/$superfamily --groupsim_matrix id --gs_eval no 1> $LOCAL_TMP_DIR/$superfamily/funfhmmer.stdout 2> $LOCAL_TMP_DIR/$superfamily/funfhmmer.stderr   
 
 # funfhmmer.pl Usage:
 
