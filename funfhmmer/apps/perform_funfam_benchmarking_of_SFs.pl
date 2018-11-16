@@ -17,12 +17,14 @@ my $USAGE = <<"__USAGE__";
 
 Usage:
     
-    perl $0 <CATH_version> <PROJECT_DIR> <LIST NAME> <uniprot annotation: SP/ALL> <FORCE GET LATEST ECANNO (Y/N)>
-    perl $0 4.2 /cath/people2/ucbtdas/git/ffer_test/funfhmmer /export/sayoni/funfhmmer_v4_2_0/kinase_list SP Y
+    NOTE: Run this in /cath/.... environment, not in HPC as it uses CATH db info
+    
+    perl $0 <CATH_version> <PROJECT_APP_DIR> <LIST NAME> <uniprot annotation: SP/ALL> <force_get_latest_anno: (Y/N)> <LOCAL_RESULT_DIR> <BENCHMARK_DIR>
+    perl $0 4.2 /cath/people2/ucbtdas/git/ffer/funfhmmer SF_listname SP N <RESULT_DIR> <BENCHMARKING_DIR>
 
 __USAGE__
 
-if(scalar @ARGV !=5) {
+if(scalar @ARGV !=7) {
 	print $USAGE;
 	exit;
 }
@@ -32,16 +34,23 @@ my $dirpath  = $ARGV[1];
 my $listname = $ARGV[2];
 my $anno_type = $ARGV[3];
 my $force_get_latest_annotation= $ARGV[4];
+my $result_dir = $ARGV[5];
+my $benchmark_dir = $ARGV[6];
 
 chomp($dirpath);
 chomp($listname);
 
+my $DATADIR= path("/export/sayoni/funfhmmer_v4_2_0/data/trees");
+my $ANNODIR = path("/export/sayoni/funfhmmer_v4_2_0/benchmarking/SF_anno");
+
 my $DIR= path("$dirpath");
 my $APPSDIR= $DIR->child("apps");
-my $DATADIR= $DIR->child("data");
-my $RESULTSDIR= $DIR->child("results");
-my $BENCHDIR = $DIR->child("benchmarking");
+my $RESULTSDIR= path("$result_dir");
+my $BENCHDIR = path("$benchmark_dir");
 
+die "! ERROR: Result dir '$RESULTSDIR' does not exist\n"
+    unless -e $RESULTSDIR;
+    
 unless($BENCHDIR->exists){
 	$BENCHDIR->mkpath;
 }
@@ -55,7 +64,8 @@ my $db = Cath::Schema::Biomap->connect_by_version("$cath_version");
 my %sc_num =();
 my @superfamily_lines=$SFLISTFILE->lines;
 
-my $stats_file = "$listname.STATS.$anno_type.tsv";
+my $stats_file = $BENCHDIR->path("FUNFAM.STATS.$anno_type.tsv");
+
 open(STATS, ">$stats_file") or die "Can't open file $stats_file\n";
 print STATS "Superfamily\ts90s\tFFs\tDopsHi%\ts90s_HighDops%\tSeqNum_HighDops%\tAvgDOPS\tAvgSeqNum\tSingletons%\tFF_withEC%\tECpurity>80%\tECpurity>90%\tECpurity100%\n";
 
@@ -78,7 +88,7 @@ foreach my $line (@superfamily_lines){
     my %sf_hash=();
 
     my $STARTINGCLUSTERDATA= $DATADIR->path("$SF/simple_ordering.hhconsensus.windowed/starting_cluster_alignments");
-    my $SFannofile = path("$SFBENCHDIR/$SF.md5.uniprot.ec.anno");
+    my $SFannofile = path("$ANNODIR/$SF.md5.uniprot.ec.anno");
 
     #get SF annotations
         
@@ -128,7 +138,7 @@ foreach my $line (@superfamily_lines){
         }
         
         # Write all uniprot accs to file for fetching annotations
-        my $accs_file = path( "$SFBENCHDIR/$SF.accs" );
+        my $accs_file = path( "$ANNODIR/$SF.accs" );
         my $accs_fh = $accs_file->openw;
         
         foreach my $acc (sort {$uniprot_accs{$a} cmp $uniprot_accs{$b}} keys %uniprot_accs){
@@ -198,7 +208,7 @@ foreach my $line (@superfamily_lines){
 		$sum_dops=$sum_dops+$aln_dops;
 
         # get EC purity of the clusters
-        my ($tot_md5_num,$md5s_with_ec,$uniprots_withec,$ecnum,$mostcommon_ECnum_present_in) = &get_ec_purity($dirname, $aln, $SFannofile, $anno_type);
+        my ($tot_md5_num,$md5s_with_ec,$uniprots_withec,$ecnum,$mostcommon_ECnum_present_in) = &get_ec_purity($SFBENCHDIR, $aln, $SFannofile, $anno_type);
 
 		if($tot_md5_num){
                     
@@ -219,12 +229,12 @@ foreach my $line (@superfamily_lines){
 				$p80++;
 			}
 		}
-        exit 0;
+###        exit 0;
     }
       
     close EC_PURITY;
-            
-    #calculate cluster aln stats
+    
+#calculate cluster aln stats
         
 	my $s90_high_dops_percent = ($sum_s90s_high_dops/$tot_s90s)*100;
 	my $seqnum_high_dops_percent = ($sum_seqs_high_dops/$tot_seqs)*100;
@@ -267,10 +277,9 @@ sub get_ec_purity{
     my ($dir, $aln, $annofile, $anno_type) = @_;
     my @array;
     
-    my $annodirname = dirname($annofile);
     my $alnname = basename($aln);
     
-    my $FF_anno_type_dir = path("$annodirname/$anno_type");
+    my $FF_anno_type_dir = path("$dir/$anno_type");
     unless($FF_anno_type_dir->exists){
         $FF_anno_type_dir->mkpath;
     }
