@@ -1,19 +1,47 @@
 package Funfhmmer::Merge;
 
+=head1 NAME
+
+Funfhmmer::Merge - object to merge (concatenate) sequence cluster files
+
+=head1 SYNOPSIS
+
+	use Funfhmmer::Merge
+
+=head1 DESCRIPTION
+
+This is used to merge (concatenate) sequence cluster alignment files.
+
+=cut
+
 use strict;
 use warnings;
+
+# core modules
 use FindBin;
 use File::Basename;
 use File::Copy;
-use Path::Tiny;
-
-# non-core modules
-use lib "$FindBin::Bin/../lib/perl5";
-use Funfhmmer::Align;
-
 use Exporter qw(import);
 
+# non-core modules
+use Path::Tiny;
+
+# Funfhmmer modules
+use lib "$FindBin::Bin/../lib";
+use Funfhmmer::Align;
+
+
 our @EXPORT_OK = qw(merge_use_gemma_alns merge_cluster_pair merge_gs_3);
+
+=head1 METHODS
+
+=head2 merge_use_gemma_alns()
+
+...
+
+	merge_use_gemma_alns( $input1, $input2, $output, $dir )
+
+=cut
 
 sub merge_use_gemma_alns{
 	
@@ -31,6 +59,14 @@ sub merge_use_gemma_alns{
 	$inputfile2->remove;
 	
 }
+
+=head2 merge_cluster_pair()
+
+...
+
+	merge_cluster_pair( $input1, $input2, $output, $dir )
+
+=cut
 
 sub merge_cluster_pair{
 
@@ -51,6 +87,14 @@ sub merge_cluster_pair{
 	$inputfile2->remove;
 	
 }
+
+=head2 merge_gs_3()
+
+...
+
+	merge_gs_3( $input1, $input2, $input3, $output, $dir )
+
+=cut
 
 sub merge_gs_3{
 
