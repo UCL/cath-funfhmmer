@@ -2,7 +2,8 @@
 """
  group_sim_sdp.py - Copyright Tony Capra 2008 - Created: 05/13/08
 
- Change log: 
+ Change log:
+22/11/18 - added condition to process 'U' in aminoacid sequences in read aln subs
  09/11/09 - fixed alignment parser bug that required new line at end
             of alignment
  06/13/08 - changed format for group_id specificication to
@@ -174,14 +175,14 @@ def read_fasta_alignment(filename):
 
 	    if cur_seq != '':
 		alignment.append(cur_seq.replace('B', 'D').replace('Z', 'Q')\
-				 .replace('X', '-'))
+				 .replace('X', '-').replace('U', '-'))
 		cur_seq = ''
 	elif line[0] in iupac_alphabet:
 	    cur_seq += line
 
     # add the last sequence
     alignment.append(cur_seq.replace('B', 'D').replace('Z', 'Q')\
-		     .replace('X', '-'))
+		     .replace('X', '-').replace('U', '-'))
 
     return names, alignment
 	
@@ -208,10 +209,10 @@ def read_clustal_alignment(filename):
 	    if t[0] not in names:
 		names.append(t[0])
 		alignment.append(t[1].upper().replace('B', 'D')\
-				 .replace('Z', 'Q').replace('X', '-'))
+				 .replace('Z', 'Q').replace('X', '-').replace('U', '-'))
 	    else:
 		alignment[names.index(t[0])] += t[1].upper().replace('B', 'D')\
-		.replace('Z', 'Q').replace('X','-')
+		.replace('Z', 'Q').replace('X','-').replace('U', '-')
 		   
     return names, alignment
 
