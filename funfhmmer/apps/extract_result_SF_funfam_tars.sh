@@ -1,20 +1,18 @@
 #!/bin/bash
 
 # Set the FunFHMMer project directories
-RESULTS=${PROJECTHOME}/results
-JOB_STATUS=${PROJECTHOME}/job_status
-#SCRIPTNAME="run_funfhmmer_in_bchuckle_cluster-SFs."
 
-if [ "$#" -ne 1 ]; then
+if [ "$#" -ne 2 ]; then
+    echo "Usage:"
+    echo ""
+    echo "$0 <RESULTSDIR> <LOGFILENAME>"
+    echo ""
 	echo "ERROR: No script log name has not been passed, received $# arguments";
 	exit;
 fi
 
-CHECK_TARS_LOG=$1
-
-echo ""
-echo "Untarring and checking the result folders:"
-echo ""
+RESULTS=$1
+CHECK_TARS_LOG=$2
 
 # Untar result directories and look for empty files
 for file in $RESULTS/*.tar.gz ;
@@ -39,6 +37,9 @@ do
 		fi
   	done
 
+    # echo "Removing $RESULTS/$SF/funfam_alignments/analysis_data/"
+    # rm -r $RESULTS/$SF/funfam_alignments/analysis_data/
+
   	logfile=$RESULTS/$SF/$SF.LOG
   
 	if [ -s $logfile ] ; then
@@ -55,11 +56,5 @@ do
             echo "$SF: ERROR - $SF is INCOMPLETE " >> $CHECK_TARS_LOG
     		fi
   	fi
+
 done
-
-exit
-
-echo ""
-echo "Here are the job status files:"
-echo ""
-

@@ -1,17 +1,42 @@
 package Funfhmmer::Groupsim::GSanalysis;
+
+=head1 NAME
+
+Funfhmmer::Groupsim::GSanalysis - object to analyse GroupSim scores for cluster alignment files
+
+=head1 SYNOPSIS
+
+	use Funfhmmer::Groupsim::GSanalysis
+
+=head1 DESCRIPTION
+
+This is used to analyze GroupSim files for sequence cluster alignments.
+
+=cut
+
 use strict;
 use warnings;
+
+# core modules
 use FindBin;
 use File::Basename;
-
-# non-core modules
-use lib "$FindBin::Bin/../lib/perl5";
-use File::Slurp;
 use List::Util qw( min max );
-
 use Exporter qw(import);
 
+# Funfhmmer modules
+use lib "$FindBin::Bin/../lib";
+
 our @EXPORT_OK = qw( );
+
+=head1 METHODS
+
+=head2 scoreanalysis()
+
+...
+
+	scoreanalysis( $scores_array_ref, $dops1, $dops2, $e, $e_q1, $e_q3 )
+
+=cut
 
 sub scoreanalysis{
 
@@ -154,6 +179,17 @@ sub scoreanalysis{
 			return ($merge,$case);
 		}
 	}
+	# Added in Nov
+	if ($dops1 < 70 && $dops2 < 70) {
+       if($max_gs_none_scores2 == $col_thresh4_7 || $max_gs_scores1 == $col_thresh4_7){
+		
+			$merge=0;
+			$case="Max cols: 0.4-0.7, not enough similar";
+
+			return ($merge,$case);
+			
+	   }
+    }
 
 	return ($merge,$case);
 }

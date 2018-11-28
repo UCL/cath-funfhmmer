@@ -1,26 +1,39 @@
 package Funfhmmer::TestIO;
+
+=head1 NAME
+
+Funfhmmer::TestIO - object to test input and output
+
+=head1 SYNOPSIS
+
+	use Funfhmmer::TestIO
+
+=head1 DESCRIPTION
+
+
+=cut
+
 use strict;
 use warnings;
 use FindBin;
 
 # non-core modules
-use lib "$FindBin::Bin/../lib/perl5";
-use File::Slurp;
+use lib "$FindBin::Bin/../lib";
 
 use Exporter qw(import);
 
+
 our @EXPORT_OK = qw(check_input check_output);
 
-=head2 check_input
-       
-=over
+=head1 METHODS
 
-=item superfamily 
+=head2 check_input()
 
+...
 
-=back
- 
-=cut 
+	check_input($superfamily, $evalthresh_gs_start, $evalthresh_q3, $wd)
+
+=cut
 
 sub check_input{
 	my ($superfamily, $evalthresh_gs_start, $evalthresh_q3, $wd) = @_;
@@ -77,6 +90,14 @@ sub check_input{
 	}
 	return $error_count;
 }
+
+=head2 check_output()
+
+...
+
+	check_output($superfamily, $wd)
+
+=cut
 
 sub check_output{
 	my ($superfamily, $wd) = @_;

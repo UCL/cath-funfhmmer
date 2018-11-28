@@ -2,52 +2,92 @@ package Funfhmmer::Align;
 
 =head1 NAME
 
-Funfhmmer::Align - Object to make an alignment (collection of protein sequences)
+Funfhmmer::Align - object to make an alignment (collection of protein sequences)
 
 =head1 SYNOPSIS
 
-Note: usually this object is created through L<Funfhmmer::Align>
+	use Funfhmmer::Align
 
-=head1 METHODS
+=head1 DESCRIPTION
+
+This is used to align sequence cluster files.
 
 =cut
 
 use strict;
 use warnings;
+
+# core modules
 use File::Basename;
-use Path::Tiny;
 use FindBin;
 use Exporter qw(import);
 
-use lib "$FindBin::Bin/../lib/perl5";
+# non-core modules
+use Path::Tiny;
+
+#Funfhmmer modules
+use lib "$FindBin::Bin/../lib";
 
 our @EXPORT_OK = qw(generate_clusterfaa_align generate_catcluster_align);
 
+=head1 METHODS
+
+=head2 generate_clusterfaa_align()
+
+Returns aligned fasta file for a cluster fasta filename in a directory
+
+	generate_clusterfaa_align($clustername, $dir)
+
+=cut
+
 sub generate_clusterfaa_align{
+	
 	my ($clustername, $dir) = @_;
 	my $cluster_faa = path("$dir", "$clustername.faa");
 	my $cluster_aln = path("$dir", "$clustername.aln");
+	
 	unless($cluster_aln->exists){
+		
 		&align($cluster_faa, $cluster_aln);
 		&check_align($cluster_faa, $cluster_aln);
+	
 	}
+	
 }
 
+=head2 generate_catcluster_align()
+
+Returns an aligned file for a concatenated file of two alignments
+
+	generate_catcluster_align($input_path, $output_path)
+
+=cut
+
 sub generate_catcluster_align{
+	
 	my ($input_path, $output_path) = @_;
+	
 	if(!-e "$output_path" || -z "$output_path"){
+		
 		&align($input_path, $output_path);
 		&check_align($input_path, $output_path);
+		
 	}
+	
 }
+
+=head2 check_align()
+
+Checks the generated aligned file. If aln file is non-existant or empty, redo the alignment.
+If a non-empty alignment file has been created, delete the fasta file.
+
+	check_align($cluster_faa, $cluster_aln)
+
+=cut
 
 sub check_align{
 	my ($cluster_faa, $cluster_aln) = @_;
-	#####
-	# Check whether aln file is generated and if it is empty, then quit
-	# if aln file is non-existant or empty, make alignment
-	# if non-empty aln has been created, delete the faa file
-	#####
+	
 	if(!-e "$cluster_aln" || -z "$cluster_aln"){
 		&align($cluster_faa, $cluster_aln);
 	}
@@ -56,23 +96,36 @@ sub check_align{
 	}
 }
 
+=head2 align()
+
+Returns a aligned file for an input fasta file
+
+	align($cluster_faa, $cluster_aln)
+
+=cut
+
 sub align{
+	
 	my ($cluster_faa, $cluster_aln) = @_;
+	
 	my $bindir = path( $FindBin::Bin, "..", "bin" );
 	my $cdhit = path("$bindir/cdhit-master","cd-hit");
 	my $mafft = path("$bindir/mafft-linux64","mafft.bat");
-
 
 	my $seqnumber = `grep -c '>' $cluster_faa`;
 	chomp($seqnumber);
 
 	if($seqnumber == 1){
+		
 		rename("$cluster_faa", "$cluster_aln");
+		
 	}
 	else {	#####
+		
+		my $cdhit_operation = 0;
+		
 		# If the clusters are very big, run cd-hit on the cluster sequences to reduce processing time
 		#####
-		my $cdhit_operation = 0;
 =head
 		if($seqnumber > 3000 && $seqnumber < 10000){
 			#####
@@ -99,14 +152,21 @@ sub align{
 		#####
 		# Align sequences using MAFFT
 		#####
+		
 		if($seqnumber >= 2 && $seqnumber <= 500){
+			
 			system("$mafft --anysymbol --amino --quiet --localpair --maxiterate 1000 $cluster_faa > $cluster_aln");
 		}
+		
 		elsif($seqnumber >= 501 && $seqnumber <= 2000){
+			
 			system("$mafft --anysymbol --amino --quiet --maxiterate 2 $cluster_faa > $cluster_aln");
+			
 		}
 		elsif($seqnumber >= 2001){
+			
 			system("$mafft --anysymbol --amino --quiet --retree 1 $cluster_faa > $cluster_aln");
+			
 		}
 	}
 }

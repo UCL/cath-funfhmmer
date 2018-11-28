@@ -1,23 +1,49 @@
 package Funfhmmer::Groupsim;
+
+=head1 NAME
+
+Funfhmmer::Groupsim - object to generate GroupSim scores for an alignment
+
+=head1 SYNOPSIS
+
+	use Funfhmmer::Groupsim
+
+=head1 DESCRIPTION
+
+This is used to generate GroupSim scores for an alignment containing two or more subgroups of sequences (clusters).
+
+=cut
+
 use strict;
 use warnings;
+
+# core modules
 use FindBin;
 FindBin::again();
 use File::Basename;
-use Statistics::Descriptive;
 use File::Copy;
-
-# added #new lines on 10082017 to see if new distribution features can be used to split trees
+use Exporter qw(import);
 
 # non-core modules
-use lib "$FindBin::Bin/../lib/perl5";
-use File::Slurp;
+use Statistics::Descriptive;
 use Path::Tiny;
-use Exporter qw(import);
+
+# Funfhmmer modules
+use lib "$FindBin::Bin/../lib";
 
 our $bindir = path($FindBin::Bin, "..", "bin");
 
 our @EXPORT_OK = qw(gs_process);
+
+=head1 METHODS
+
+=head2 gs_process()
+
+...
+
+	gs_process( $clustername1, $clustername2, $dir, $gs_matrix )
+
+=cut
 
 sub gs_process{
 
@@ -56,6 +82,14 @@ sub gs_process{
 
 	return @score;
 }
+
+=head2 groupsim_identity_matrix()
+
+...
+
+	groupsim_identity_matrix( $align, $grp1, $grp2, $gs_rawfile, $gs_file, $dir )
+
+=cut
 
 sub groupsim_identity_matrix{
 	
@@ -103,6 +137,14 @@ sub groupsim_identity_matrix{
 	}
 }
 
+=head2 groupsim_mclachlan_matrix()
+
+...
+
+	groupsim_mclachlan_matrix( $align, $grp1, $grp2, $gs_rawfile, $gs_file, $dir )
+
+=cut
+
 sub groupsim_mclachlan_matrix{
 	
 	my ($align, $grp1, $grp2, $gs_rawfile, $gs_file, $dir) = @_; 
@@ -127,11 +169,19 @@ sub groupsim_mclachlan_matrix{
 		
 		unlink($align);
 	}
-} 
+}
+
+=head2 add_cluster_num_in_aln_headers()
+
+...
+
+	add_cluster_num_in_aln_headers( $funfam1path, $funfam2path, $dir )
+
+=cut
 
 sub add_cluster_num_in_aln_headers{
 	
-	my ($funfam1path,$funfam2path,$dir) = @_; 
+	my ($funfam1path, $funfam2path, $dir) = @_; 
 	my $funfam1 = basename($funfam1path, ".aln");
 	my $funfam2 = basename($funfam2path, ".aln");
 	my $filename1="$dir/$funfam1.$funfam2";
@@ -174,6 +224,14 @@ sub add_cluster_num_in_aln_headers{
 	close(OUTFILE);
 
 }
+
+=head2 groupsim_rawscores_process_quantitate()
+
+...
+
+	groupsim_rawscores_process_quantitate( $$CONSfile )
+
+=cut
 
 sub groupsim_rawscores_process_quantitate{
 	
