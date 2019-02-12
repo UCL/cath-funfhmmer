@@ -30,6 +30,7 @@ use Path::Tiny;
 
 # Funfhmmer modules
 use lib "$FindBin::Bin/../lib";
+use Funfhmmer::Align;
 
 our $bindir = path($FindBin::Bin, "..", "bin");
 
@@ -162,7 +163,7 @@ sub groupsim_mclachlan_matrix{
 		}
 		
 		&groupsim_rawscores_process_quantitate($gs_rawfile);
-		unlink($gs_rawfile);
+		#unlink($gs_rawfile);
 		
 		my $gs_mergealn_name= basename("$align");
 		copy($align,"$dir/$analysis_subfoldername/$gs_mergealn_name");
@@ -247,15 +248,15 @@ sub groupsim_rawscores_process_quantitate{
 		chomp($line);
 		unless($line=~ /\#/){
 			#print "$line\n";
-			if($line=~ /(\d*)\t(\w\w\w\w|\-?\d\.\d*)/){
+			if($line=~ /^(\d*)\t(.*)$/){
 				my $num = $1 + 1;
-				$line =~ s/$1/$num/;
-				if($p==0){
-					$p++;
-				}
-				else{
-					print OUTFILE "$line\n";
-				}
+				#$line =~ s/$1/$num/;
+				#if($p==0){
+				#	$p++;
+				#}
+				#else{
+				print OUTFILE "$num\t$2\n";
+				#}
 			}
 		}
 	}
