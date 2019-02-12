@@ -1,14 +1,17 @@
 #!/bin/bash
 
-if [ "$#" -lt 2 ]; then
-	echo "ERROR: Project dir and/or HPC environment (chuckle|legion|myriad) has not been passed, received $# arguments";
+if [ "$#" -lt 2 ]; 
+    echo "Usage:"
+    echo "$0 <PROJECTHOME> <HPC_CLUSTER> <HPC_PROJECT_NAME>"
+    echo ""
+	echo "ERROR: Project dir and/or HPC environment (chuckle|legion|myriad) and/or HPC project name has not been passed, received $# arguments";
 	exit;
 fi
 
 PROJECTHOME=$1
 HPC_CLUSTER=$2
 PROJECT_NAME=$3
-PROJECT_NAME=${PROJECT_NAME:-funfhmmer_v4_2_0}
+#PROJECT_NAME=${PROJECT_NAME:-funfhmmer_v4_2_0}
 
 # Get the project directory
 if [ ! -d "$PROJECTHOME" ]; then
@@ -53,7 +56,7 @@ case "$HPC_CLUSTER" in
 # on chuckle cluster
 chuckle)
 
-	REMOTE_DATA_PATH=/cluster/project8/ff_stability/${PROJECT_NAME}
+	REMOTE_DATA_PATH=/home/${PROJECT_NAME}
 	REMOTE_HOST=bchuckle.cs.ucl.ac.uk
 
     #SGE_REQUEST_FLAGS="h_rt=4:0:0,h_vmem=7G,tmem=7G"
