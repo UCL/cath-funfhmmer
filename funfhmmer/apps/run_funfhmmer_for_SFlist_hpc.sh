@@ -17,7 +17,7 @@
 if [ "$#" -lt 3 ]; then
     echo "Usage:"
     echo ""
-    echo "$0 <PROJECTHOME> <SFLISTFILE> <HPC_CLUSTER> <OPTIONAL: AUTOMERGE_LOWEVAL> <OPTIONAL: PROJECTHOME_NAME>"
+    echo "run_funfhmmer_for_SFlist_hpc.sh <PROJECTHOME> <SFLISTFILE> <HPC_CLUSTER> <AUTOMERGE_LOWEVAL> <PROJECTHOME_NAME>"
     echo ""
 	echo "ERROR: All required arguments has not been passed, received $# arguments"
 	exit;
@@ -27,9 +27,9 @@ DIR=$1
 SFLISTFILE=$2
 HPC_CLUSTER=$3
 AUTOMERGE_LOWEVAL=$4
-AUTOMERGE_LOWEVAL=${AUTOMERGE_LOWEVAL:-1}
+#AUTOMERGE_LOWEVAL=${AUTOMERGE_LOWEVAL:-1}
 PROJECT_NAME=$5
-PROJECT_NAME=${PROJECT_NAME:-funfhmmer_v4_2_0}
+#PROJECT_NAME=${PROJECT_NAME:-funfhmmer_v4_2_0}
 
 # Get the project directory
 if [ ! -d "$DIR" ]; then
