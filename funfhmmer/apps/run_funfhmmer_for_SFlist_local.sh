@@ -52,12 +52,12 @@ do
 
 	SF_DATA_DIR=$DATADIR/$superfamily
 
-	#echo "$SF_DATA_DIR"
+	echo "$SF_DATA_DIR"
 	
  	if [ -d $SF_DATA_DIR ]; then
         
 	        echo ""
-        	echo "Generating FunFams locally for $superfamily here: $LOCAL_TMP_DIR/ ..."
+        	echo "Generating FunFams locally for $superfamily here: $LOCAL_TMP_DIR/"
         	echo ""
         
         	rsync -raz $SF_DATA_DIR/ $LOCAL_TMP_DIR/$superfamily/
@@ -66,7 +66,6 @@ do
         	perl $APPSDIR/funfhmmer.pl --sup $superfamily --dir $LOCAL_TMP_DIR/$superfamily --groupsim_matrix id --automerge_loweval $AUTOMERGE_LOWEVAL 1> $LOCAL_TMP_DIR/$superfamily/funfhmmer.stdout 2> $LOCAL_TMP_DIR/$superfamily/funfhmmer.stderr
         
         	echo "Finished generating FunFams for $superfamily."
-            echo ""
 	
     	fi
 done
