@@ -15,6 +15,7 @@ use Test::More;
 
 # Funfhmmer modules
 use lib "$FindBin::Bin/../lib";
+use Funfhmmer::Scorecons;
 
 # non-core modules
 use Path::Tiny;
@@ -27,6 +28,9 @@ use_ok( 'Funfhmmer::Scorecons' );
 my $example_datadir = path($FindBin::Bin, "..", "t/example_data");
 my $example_funfam_datadir = $example_datadir->child("funfam_alignments");
 my $example_funfam_analysis_datadir = $example_funfam_datadir->child("analysis_data");
+unless(-e "$example_funfam_analysis_datadir"){
+        mkdir($example_funfam_analysis_datadir);
+}
 
 my $example_expected_datadir = $example_datadir->child("expected_files");
 
@@ -36,7 +40,7 @@ my $aln_name = "cluster1";
 ok( !-z "$example_funfam_datadir/$aln_name.aln", 'Test aln (non-empty) file exists.');
 
 # run scorecons program to generate scorecons and dops files (inside subfolder ./analysis_data) for test alignment file
-my $dops = Funfhmmer::Scorecons::assign_dops_score($aln_name, $example_funfam_datadir);
+my $dops = Funfhmmer::Scorecons::assign_dops_score($aln_name, $example_datadir);
 
 #check test scons and dops file generated
 
