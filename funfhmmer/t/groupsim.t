@@ -28,7 +28,9 @@ use_ok( 'Funfhmmer::Groupsim' );
 my $example_datadir = path($FindBin::Bin, "..", "t/example_data");
 my $example_funfam_datadir = $example_datadir->path("funfam_alignments");
 my $example_funfam_analysis_datadir = $example_funfam_datadir->path("analysis_data");
-
+unless(-e "$example_funfam_analysis_datadir"){
+        mkdir($example_funfam_analysis_datadir);
+}
 my $example_expected_datadir = $example_datadir->child("expected_files");
 
 my $aln_name1 = "cluster1";
