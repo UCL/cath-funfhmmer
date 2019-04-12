@@ -219,8 +219,8 @@ foreach (@merges){
 
 			# For higher Evalues (from $evalthresh_gs_start to $evalthresh_q3), we need to use Groupsim. Use DOPS of the clusters to check MSA of clusters are informative enough - choose GS score analysis method accordingly
 
-			my $node1_dops = Funfhmmer::Scorecons::assign_dops_score($node1, $dir);
-			my $node2_dops = Funfhmmer::Scorecons::assign_dops_score($node2, $dir);
+			my $node1_dops = Funfhmmer::Scorecons::assign_dops_score($node1, $funfam_dir);
+			my $node2_dops = Funfhmmer::Scorecons::assign_dops_score($node2, $funfam_dir);
 
 
 			# The node aln with higher dops is taken as the first alignment as this seemed to have an affect on the GroupSim Groupsim_scores in an analysis on TPP superfamily. This might be due to the fact that the first aln is used as a reference is some way. Need to investigate whether this is true for all superfamilies
@@ -440,9 +440,9 @@ sub check_if_one_child_node_does_not_exist{
 		my $cl2 = $not_merged_list{$node2}[1];
 
 		#get dops score of MSA using scorecons program
-		my $cl1_dops = Funfhmmer::Scorecons::assign_dops_score($cl1, $dir);
-		my $cl2_dops = Funfhmmer::Scorecons::assign_dops_score($cl2, $dir);
-		my $node1_dops = Funfhmmer::Scorecons::assign_dops_score($node1, $dir);
+		my $cl1_dops = Funfhmmer::Scorecons::assign_dops_score($cl1, $funfam_dir);
+		my $cl2_dops = Funfhmmer::Scorecons::assign_dops_score($cl2, $funfam_dir);
+		my $node1_dops = Funfhmmer::Scorecons::assign_dops_score($node1, $funfam_dir);
 
 		# Get Groupsim_scores for both merging and compare and then decide
 		# Use Cluster with higher dops as ref. or 1st group always!
