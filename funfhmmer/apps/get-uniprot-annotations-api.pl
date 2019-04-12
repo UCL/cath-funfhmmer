@@ -6,21 +6,19 @@
 use strict;
 use warnings;
 
+#use modules
+use Getopt::Long;
+use Data::Dumper;
+use File::Basename;
 use HTTP::Tiny;
 use JSON::MaybeXS;
 use Path::Tiny;
 use List::MoreUtils qw(uniq);
-use Log::Log4perl qw/ :easy /;
-
-use Data::Dumper;
-use File::Basename;
 
 # usage
 my $USAGE = <<_USAGE;
 
-$0 <list of uniprot accs> <output filename>
-
-$0 PROJECTHOME/benchmark/SF.list PROJECTHOME/benchmark/SF.md5.uniprot.ec.anno
+$0 --uniprot_list <uniprot accessions list> --anno_output <output filepath>
 
 _USAGE
 
@@ -29,9 +27,16 @@ if ( scalar @ARGV != 2 ) {
     die "$USAGE\n";
 }
 
+my ($list, $output);
+
+GetOptions (    "uniprot_list=s"    => \$list,    # string
+                "anno_output=s"     => \$output,  # string
+            )
+            or die("Error in command line arguments.\n$USAGE\n");
+
 # get the uniprot accessions to query
-my $accslist = path( $ARGV[0] );
-my $outputfile = path( $ARGV[1] );
+my $accslist = path( $list );
+my $out_file = path( $output );
 
 my $listname = basename( $accslist );
 
@@ -42,56 +47,48 @@ my $json = JSON->new;
 # API base url
 my $base_url = "https://www.ebi.ac.uk/proteins/api/proteins/";
 
-# don't write out to file if it already exists
-my $out_file = path( "$outputfile" );
+my $results_fh = $out_file->openw;
+print "Getting latest UniProtKB annotations for $listname\n";
 
-unless(-e "$out_file"){
+my @lines = path( $accslist )->lines( { chomp => 1 } );
 
-    my $results_fh = $out_file->openw;
-    print "Getting latest UniProtKB annotations for $listname\n";
+# store response data if acc has an EC number
+my %response_data;
 
-    my @lines = path( $accslist )->lines( { chomp => 1 } );
-    #print "@accs";
-
-    # store response data if acc has an EC number
-    my %response_data;
-
-    # feed each accession into API
-    my %ec_numbers;
-    my %lines_to_print;
+# feed each accession into API
+my %ec_numbers;
+my %lines_to_print;
     
-    foreach my $line ( @lines ) {
+foreach my $acc ( @lines ) {
         
-        my ($md5, $acc) = split("\t", $line);
-        #print "Getting API response for: $acc...\n";
-        my $response_data = get_api_response( $acc );
+    chomp($acc);
+    
+    #print "Getting API response for: $acc...\n";
+    my $response_data = get_api_response( $acc );
 
-        #print Dumper $response_data;
+    #print Dumper $response_data;
+
+    # get any EC data out
+    my @ec_numbers = get_ec_data( $response_data );
+    my @uniq_ecs = uniq(@ec_numbers);
+    my $ec_string = join(';', @uniq_ecs);
         
-        # get any EC data out
-        my @ec_numbers = get_ec_data( $response_data );
-        my @uniq_ecs = uniq(@ec_numbers);
-        my $ec_string = join(';', @uniq_ecs);
+    # get Swiss-Prot or not data
+    my $review = get_SP_data( $response_data );
         
-        # get Swiss-Prot or not data
-        my $review = get_SP_data( $response_data );
-        
-        if ($ec_string) {
+    if ($ec_string) {
             
-            if($review){
+        if($review){
                 
-                #print "$acc\t$ec_string\t$review\n";
-                print $results_fh "$md5\t$acc\t$ec_string\t$review\n";
-            
-            }
+            print $results_fh "$acc\t$ec_string\t$review\n";
             
         }
-        
-        #exit 0;
-        
+            
     }
-    
+                
 }
+
+print "Completed generating EC and Swiss-Prot annotations.\nAnno file: $out_file\n";
 
 
 sub get_api_response {
