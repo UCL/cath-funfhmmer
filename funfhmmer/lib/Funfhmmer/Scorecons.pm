@@ -47,27 +47,27 @@ our @EXPORT_OK = qw(calculate_scorecons_dops assign_dops_score);
 
 sub calculate_scorecons_dops{
 
-	my ($cluster_name, $dir) = @_;
+	my ($cluster_name, $funfam_dir) = @_;
 	my $analysis_subfoldername = "analysis_data";
-	my $cluster_dopsfile= path("$dir/$analysis_subfoldername","$cluster_name.aln.dops");
+	my $cluster_dopsfile= path("$funfam_dir/$analysis_subfoldername","$cluster_name.aln.dops");
 	
 	unless($cluster_dopsfile->exists){
 	
-		if(path("$dir", "$cluster_name.aln")->exists){
+		if(path("$funfam_dir", "$cluster_name.aln")->exists){
 		
-			system "$bindir/scorecons/scorecons -a $dir/$cluster_name.aln -o $dir/$analysis_subfoldername/$cluster_name.aln.scorecons -m $bindir/scorecons/PET91mod.mat2 1> $cluster_dopsfile 2> $dir/$analysis_subfoldername/funfhmmer_run_dops.temp";
+			system "$bindir/scorecons/scorecons -a $funfam_dir/$cluster_name.aln -o $funfam_dir/$analysis_subfoldername/$cluster_name.aln.scorecons -m $bindir/scorecons/PET91mod.mat2 1> $cluster_dopsfile 2> $dir/$analysis_subfoldername/funfhmmer_run_dops.temp";
 			
-			unlink("$dir/$analysis_subfoldername/$cluster_name.aln.scorecons"); 
+			unlink("$funfam_dir/$analysis_subfoldername/$cluster_name.aln.scorecons"); 
 			
 			#Edit the dops file to replace the file from "DOPS score: xxx" to just "xxx"
 			system("perl -p -i -e 's/DOPS score: //g' $cluster_dopsfile");
 		}
 		
-		elsif(-e "$dir/$analysis_subfoldername/$cluster_name.aln"){
+		elsif(-e "$funfam_dir/$analysis_subfoldername/$cluster_name.aln"){
 			
-			system "$bindir/scorecons/scorecons -a $dir/$analysis_subfoldername/$cluster_name.aln -o $dir/$analysis_subfoldername/$cluster_name.aln.scorecons -m $bindir/scorecons/PET91mod.mat2 1> $cluster_dopsfile 2> $dir/$analysis_subfoldername/funfhmmer_run_dops.temp";
+			system "$bindir/scorecons/scorecons -a $funfam_dir/$analysis_subfoldername/$cluster_name.aln -o $funfam_dir/$analysis_subfoldername/$cluster_name.aln.scorecons -m $bindir/scorecons/PET91mod.mat2 1> $cluster_dopsfile 2> $funfam_dir/$analysis_subfoldername/funfhmmer_run_dops.temp";
 			
-			unlink("$dir/$analysis_subfoldername/$cluster_name.aln.scorecons");
+			unlink("$funfam_dir/$analysis_subfoldername/$cluster_name.aln.scorecons");
 			
 			system("perl -p -i -e 's/DOPS score: //g' $cluster_dopsfile");
 		}
@@ -83,12 +83,12 @@ sub calculate_scorecons_dops{
 =cut
 
 sub assign_dops_score{
-	my ($cluster_name, $dir) = @_;
+	my ($cluster_name, $funfam_dir) = @_;
 	my $analysis_subfoldername = "analysis_data";
-	my $dops_file = path("$dir/funfam_alignments/$analysis_subfoldername","$cluster_name.aln.dops");
+	my $dops_file = path("$funfam_dir/$analysis_subfoldername","$cluster_name.aln.dops");
 	
 	unless(-e "$dops_file"){
-		&calculate_scorecons_dops($cluster_name, "$dir/funfam_alignments");
+		&calculate_scorecons_dops($cluster_name, "$funfam_dir");
 	}
 	my $dops_score;
 	if(-z "$dops_file"){
