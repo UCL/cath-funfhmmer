@@ -2,7 +2,7 @@
 
 if [ "$#" -ne 3 ]; then
     echo "Usage:"
-    echo "$0 <PROJECTHOME> <HPC_CLUSTER> <HPC_PROJECT_NAME>"
+    echo "bash $0 <PROJECTHOME> <HPC_CLUSTER> <HPC_PROJECT_NAME>"
     echo ""
 	echo "ERROR: Project dir and/or HPC environment (chuckle|legion|myriad) and/or HPC project name has not been passed, received $# arguments";
 	exit;
