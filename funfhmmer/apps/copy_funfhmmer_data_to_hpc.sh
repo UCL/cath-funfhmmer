@@ -1,6 +1,6 @@
 #!/bin/bash
 
-if [ "$#" -lt 2 ]; then
+if [ "$#" -ne 3 ]; then
     echo "Usage:"
     echo "$0 <PROJECTHOME> <HPC_CLUSTER> <HPC_PROJECT_NAME>"
     echo ""
