@@ -1,9 +1,9 @@
 #!/usr/bin/bash
 
-if [ "$#" -lt 2 ]; then
+if [ "$#" -lt 3 ]; then
 	echo "USAGE:"
     echo ""
-    echo "bash $0 <PROJECTHOME> <SFLISTFILE> <OPTIONAL: TRACEDIR (default:PROJECTHOME/data)> <OPTIONAL: LOCAL_FF_DIR (default:TRACEDIR/local_run)> <OPTIONAL: AUTOMERGE_LOWEVAL (default:1)>"
+    echo "bash $0 <PROJECTHOME> <SFLISTFILE> <AUTOMERGE_LOWEVAL> <OPTIONAL: TRACEDIR (default:PROJECTHOME/data)> <OPTIONAL: LOCAL_FF_DIR (default:TRACEDIR/local_run)>"
     echo ""
     echo "      NOTE: Use AUTOMERGE_LOWEVAL=1 for 1st iteration of FunFHMMer and for other iterations, use 0"
     echo ""
@@ -15,14 +15,14 @@ DIR=$1
 
 SFLISTFILE=$2
 
-TRACEDIR=$3
+AUTOMERGE_LOWEVAL=$3
+#AUTOMERGE_LOWEVAL=${AUTOMERGE_LOWEVAL:-1}
+
+TRACEDIR=$4
 TRACEDIR=${TRACEDIR:-$DIR/data}
 
-LOCAL_FF_DIR=$4
+LOCAL_FF_DIR=$5
 LOCAL_FF_DIR=${LOCAL_FF_DIR:-$TRACEDIR/local_run}
-
-AUTOMERGE_LOWEVAL=$5
-AUTOMERGE_LOWEVAL=${AUTOMERGE_LOWEVAL:-1}
 
 
 # Get the project directory
