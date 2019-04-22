@@ -2,6 +2,7 @@
 use strict;
 use warnings;
 use Path::Tiny;
+use Getopt::Long;
 use File::Basename;
 use Data::Dumper;
 
@@ -11,13 +12,17 @@ Usage:
 
     $0 <Dir path with GeMMA result folders>
 
-    E.g. $0 /export/sayoni/funfhmmer_v4_2_0/data/4711_local_run ../data
+    E.g. $0 --gemma_result_dir /export/sayoni/funfhmmer_v4_2_0/data/4711_local_run --outdir ../data
 
     This script takes the path of the GeMMA result folders and checks the GeMMA trace files 
-    It also classiffies them into categories based on #starting clusters and allocates
-    time/memory requirements for running in bchuckle.
+    It also classifies them into categories based on #starting clusters and allocates
+    time/memory requirements for running in the cluster.
     
-    NOTE: this script only analyses the folder 'simple_ordering.hhconsensus.windowed' 
+    NOTE: This script analyses ALL project folders within gemma_result_dir.
+          It only analyses the subfolder 'simple_ordering.hhconsensus.windowed' within the project directories.
+          
+          ERROR lines are defined as gemma trace lines with E-values of '0.00e+00'.
+          Manually evaluate the ERROR lines based on the position in of the merge in the tree trace.
     
     Output files:
     
@@ -29,18 +34,23 @@ Usage:
     
 __USAGE__
 
-my ($dir, $outdir) = @ARGV;
-chomp($dir);
-chomp($outdir);
-
 # exit script if all input data not provided
-if(scalar @ARGV !=2) {
+if(! scalar @ARGV) {
     print $USAGE;
     exit;
 }
 
+my ($dir, $outdir);
+
+GetOptions (
+                "gemma_result_dir=s"          => \$dir,
+                "outdir=s"                    => \$outdir,              
+            )
+            or die("Error in command line arguments.\n$USAGE\n");
+
+
 # complete tracefile have one lines less than the no. of starting clusters
-# print the array @evalue0_errorlines to get info the errorlines   
+# print the array @evalue0_errorlines to get info the error lines   
 # classify the superfamilies with complete trace files into small, medium, large and very large based on the no. of starting clusters
     
 my %small =();
