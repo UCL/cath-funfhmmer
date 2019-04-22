@@ -14,27 +14,55 @@
 
 #set -x
 
-if [ "$#" -lt 3 ]; then
-    echo "Usage:"
+if [ "$#" -lt 5 ]; then
+    echo "USAGE:"
     echo ""
-    echo "run_funfhmmer_for_SFlist_hpc.sh <PROJECTHOME> <SFLISTFILE> <HPC_CLUSTER> <AUTOMERGE_LOWEVAL> <PROJECTHOME_NAME>"
+    echo "bash $0 <PROJECTHOME> <SFLISTFILE> <HPC_CLUSTER> <PROJECTHOME_NAME> <AUTOMERGE_LOWEVAL> <OPTIONAL: TRACEDIR (default:PROJECTHOME/data)> <OPTIONAL: FFDIR (default:PROJECTHOME/results)>"
     echo ""
 	echo "ERROR: All required arguments has not been passed, received $# arguments"
+    echo ""
 	exit;
 fi
 
 DIR=$1
+
 SFLISTFILE=$2
+
 HPC_CLUSTER=$3
-AUTOMERGE_LOWEVAL=$4
+
+PROJECT_NAME=$4
+
+AUTOMERGE_LOWEVAL=$5
 #AUTOMERGE_LOWEVAL=${AUTOMERGE_LOWEVAL:-1}
-PROJECT_NAME=$5
-#PROJECT_NAME=${PROJECT_NAME:-funfhmmer_v4_2_0}
+
+TRACEDIR=$6
+TRACEDIR=${TRACEDIR:-$DIR/data}
+
+FFDIR=$7
+FFDIR=${FFDIR:-$DIR/results}
+
 
 # Get the project directory
 if [ ! -d "$DIR" ]; then
-        echo "ERROR: Cluster dir '$DIR' does not exist for $HOSTNAME $SGE_O_HOST ."
+        echo ""
+        echo "ERROR: '$DIR' does not exist for $HOSTNAME $SGE_O_HOST ."
+        echo ""
         exit;
+fi
+
+if [ ! -d "$TRACEDIR" ]; then
+        echo ""
+        echo "ERROR: '$TRACEDIR' does not exist for $HOSTNAME $SGE_O_HOST ."
+        echo ""
+        exit;
+fi
+
+if [ ! -d "$FFDIR" ]; then
+        echo ""
+        echo "'$FFDIR' does not exist."
+        mkdir -p $FFDIR || die "mkdir failed for $FFDIR"
+        echo "FFDIR '$FFDIR' created."
+        echo ""
 fi
 
 function print_date {
@@ -50,17 +78,19 @@ print_date "REMOTE_USER         $REMOTE_USER"
 print_date "RUN_ENV             $HPC_CLUSTER"
 print_date "FUNFHMMER_DIR       $DIR"          
 print_date "SFLIST              $SFLISTFILE"
+print_date "TRACEDIR            $TRACEDIR"
+print_date "FFDIR               $FFDIR"
 print_date "AUTOMERGE_LOWEVAL   $AUTOMERGE_LOWEVAL"
 
-DATADIR=$DIR/data
 APPSDIR=$DIR/apps
-RESULTSDIR=$DIR/results
-REDO_SUPS=$RESULTSDIR/REDO_SUPS.$JOB_ID.list
+REDO_SUPS=$FFDIR/REDO_SUPS.$JOB_ID.list
 
 superfamily=$(cat $SFLISTFILE | head -n $SGE_TASK_ID | tail -n 1 | awk '{printf $1}')
 
 if [ -z "$superfamily" ]; then
+    echo ""
     echo "ERROR: superfamily name is empty!"
+    echo ""
     exit;
 fi
 
@@ -82,9 +112,9 @@ run_hpc () {
     echo "[$time] #Start copying starting clusters of ${superfamily}.."
 
     #Copy the folder to FFer working dir
-    rsync -raz $DATADIR/$superfamily/ $LOCAL_TMP_DIR/$superfamily/
+    rsync -raz $TRACEDIR/$superfamily/ $LOCAL_TMP_DIR/$superfamily/
 
-    rsync -raz $DATADIR/$superfamily/starting_cluster_alignments/ $LOCAL_TMP_DIR/$superfamily/funfam_alignments/
+    rsync -raz $TRACEDIR/$superfamily/starting_cluster_alignments/ $LOCAL_TMP_DIR/$superfamily/funfam_alignments/
 
     time=$(date)
     echo "[$time] #---DONE"
@@ -116,7 +146,7 @@ run_hpc () {
         SFTREE_FUNFAMS_TAR=$superfamily.tar.gz
 
         tar -zcf $SFTREE_FUNFAMS_TAR -C $LOCAL_TMP_DIR .
-        cp $SFTREE_FUNFAMS_TAR $RESULTSDIR/$superfamily.tar.gz
+        cp $SFTREE_FUNFAMS_TAR $FFDIR/$superfamily.tar.gz
 
         echo ""
         time=$(date)
