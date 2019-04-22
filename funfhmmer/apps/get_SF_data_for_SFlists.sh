@@ -2,15 +2,19 @@
 
 # Set the FunFHMMer project directory
 DIR=${PROJECTHOME}
-DATADIR=$DIR/data
 APPSDIR=$DIR/apps
 
-if [ "$#" -ne 1 ]; then
-	echo "ERROR: Superfamily List to run has not been passed, received $# arguments";
+if [ "$#" -lt 1 ]; then
+    echo ""
+    echo "USAGE: bash $0 <SFLIST_FILE> <optional: DATADIR (default: PROJECTHOME/data)>"
+    echo ""
+	echo "ERROR: Superfamily List (and optinal DATADIR) has not been passed, received $# arguments";
 	exit;
 fi
 
 SFLISTFILE=$1
+DATADIR=$2
+DATADIR=${DATADIR:-$DIR/data}
 
 LOGFILE=$DATADIR/copyingSFdata.rsynclogfile
 
@@ -20,11 +24,16 @@ if [ ! -s $SFLISTFILE ] ; then
 	exit;
 fi
 
+echo ""
+echo "SFLIST        $SFLISTFILE"
+echo "DATADIR       $DATADIR"
+echo ""
+
 if [ -f $LOGFILE ] ; then
 	rm $LOGFILE
 fi
 
-echo "# Copying GEMMA data for the list of superfamilies ($SFLISTFILE) to data/.."
+echo "# Copying GEMMA data for the list of superfamilies ($SFLISTFILE) to DATADIR .."
 
 cat $SFLISTFILE | while read superfamilyline
 do
