@@ -9,9 +9,11 @@ if [ "$#" -ne 3 ]; then
 fi
 
 PROJECTHOME=$1
+
 HPC_CLUSTER=$2
+
 PROJECT_NAME=$3
-#PROJECT_NAME=${PROJECT_NAME:-funfhmmer_v4_2_0}
+
 
 # Get the project directory
 if [ ! -d "$PROJECTHOME" ]; then
@@ -27,10 +29,6 @@ function print_date {
 print_date "PROJECTHOME       $PROJECTHOME"          
 print_date "RUN_ENV           $HPC_CLUSTER"
 print_date "PROJECT_NAME      $PROJECT_NAME"
-
-DATADIR=$PROJECTHOME/data
-APPSDIR=$PROJECTHOME/apps
-RESULTSDIR=$PROJECTHOME/results
 
 REMOTE_USER=`whoami`
 
