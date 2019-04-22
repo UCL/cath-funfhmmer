@@ -19,14 +19,9 @@ use Math::Round;
 #
 # 							Benchmarking FunFams
 #
-# This perl script takes in a xxxxxxx and xxx
-# to generate xxxxxxxxxxxxx
-# for xxxxxxxxxxxxxxxxxx
+# This perl script takes in a project_id, starting_cluster_alignments dir and funfam_alignments dir
+# to generate benchmarking stats regarding EC purity of funfams, #singletons, #funfams with high DOPs etc. 
 #
-###
-###
-###
-### 
 #
 #####################################################################################################################################################
 
@@ -36,13 +31,15 @@ my $USAGE = <<"__USAGE__";
 Usage:
     
 	perl $0 --project_id <project_id> --project_s90_aln_dir <s90 dir> --project_funfam_aln_dir <funfam dir> --use_uniprot_review_type <swissprot/all> --force_get_latest_anno <y/n> --outdir <output dir for benchmarking result>
-    perl $0 /cath/people2/ucbtdas/git/ffer/funfhmmer SF_listname SP N <RESULT_DIR> <BENCHMARKING_DIR>
 
-    Note: --project_s90_dir should point to a starting_cluster_alignments directory 
+	E.g.: perl perform_funfam_benchmarking.pl --project_id 3.40.50.620-mda-10 --project_s90_aln_dir /cath/people2/ucbtdas/test_funfhmmer/results/local_run/3.40.50.620-mda-10/starting_cluster_alignments --project_funfam_aln_dir /cath/people2/ucbtdas/test_funfhmmer/results/local_run/3.40.50.620-mda-10/funfam_alignments --use_uniprot_review_type all --force_get_latest_anno y --outdir /cath/people2/ucbtdas/test_funfhmmer/results/local_run_benchmark
+	
+    Note: --project_s90_aln_dir should point to a 'starting_cluster_alignments' directory
+          --project_funfam_aln_dir should point to a 'funfam_alignments' directory 
     
 __USAGE__
 
-if(scalar @ARGV != 7) {
+if(! scalar @ARGV) {
 	print $USAGE;
 	exit;
 }
@@ -51,7 +48,7 @@ my ($project_id, $project_s90_aln_dir, $project_funfam_aln_dir, $anno_type, $for
 
 GetOptions (
                 "project_id=s"                => \$project_id,
-                "project_s90_aln_dir=s"       => \$project_s90_dir,
+                "project_s90_aln_dir=s"       => \$project_s90_aln_dir,
                 "project_funfam_aln_dir=s"    => \$project_funfam_aln_dir,
                 "use_uniprot_review_type=s"   => \$anno_type,    
                 "force_get_latest_anno=s"     => \$force_get_latest_anno,
@@ -84,13 +81,10 @@ unless($PROJECT_BENCHMARK_DIR->exists){
 # get SF starting clusters number
 my %sc_num =();
 
-my $stats_file = $PROJECT_BENCHMARK_DIR->path("$project_id.FUNFAM.STATS.$anno_type.tsv");
-
-open(STATS, ">$stats_file") or die "Can't open file $stats_file\n";
-print STATS "Project_ID\ts90s\tFFs\tFF%_HighDops\ts90%_inHighDopsFFs\tSeqNum%_HighDopsFFs\tAvgDops_FFs\tAvgSeqNum_FFs\tSingleton%_FFs\tFF%_withECs\tECpurity>80%\tECpurity>90%\tECpurity100%\n";
-
 # add no. of s90s in high DOPS clusters as a percentage of total no. of s90s
 # add no. of seqs in high DOPS clusters as a percentage of total no. of seqs
+
+my $stats_file = $PROJECT_BENCHMARK_DIR->path("$project_id.FUNFAM.STATS.$anno_type.tsv");
 
 unless(-e "$stats_file"){
 	
@@ -105,22 +99,26 @@ unless(-e "$stats_file"){
         
     my %ids=();
     
+	open(STATS, ">$stats_file") or die "Can't open file $stats_file\n";
+	print STATS "Project_ID\ts90s\tFFs\tFF%_HighDops\ts90%_inHighDopsFFs\tSeqNum%_HighDopsFFs\tAvgDops_FFs\tAvgSeqNum_FFs\tSingleton%_FFs\tFF%_withECs\tECpurity>80%\tECpurity>90%\tECpurity100%\n";
+	
     foreach my $aln (glob("$S90_DIR/*.aln")) {
-            
-        #print "$aln\n";
         
         # count no. of starting_clusters (s90)
         $scnum++;
             
         my $s90_name = basename($aln, ".aln");
         
+        #print "$s90_name: $aln\n";
+        
         # get the uniprot sequence headers of each aln
         my @seqheaders = `LC_ALL=C fgrep ">" $aln`;
         
         foreach my $id (@seqheaders){
-                    
+            
             $id=~/\>(\w+)/;
             my $uniprot_acc =$1;
+            #print " -- $uniprot_acc\n";
             $ids{$uniprot_acc}=$s90_name;
                     
         }
@@ -142,11 +140,12 @@ unless(-e "$stats_file"){
         }
             
         Funfhmmer::Anno::get_uniprot_anno_for_uniprot_list( $accs_file, $annofile );
+		
         #system("perl $APPSDIR/get-uniprot-annotations-api.pl $accs_file $annofile");
 
     }
 	   
-    $sc_num{$SF}=$scnum;
+    $sc_num{$project_id}=$scnum;
 
 	# get the number of FFs and how many have highDOPS, singletons
 	my $ffnum=0; my $highdops_ff=0; my $singletons =0; my $ff_ecinfo=0;
@@ -156,7 +155,7 @@ unless(-e "$stats_file"){
 	my $ec_purity_file = $PROJECT_BENCHMARK_DIR->path( "$project_id.FF.ECpurity.$anno_type.csv" );
     
 	open(EC_PURITY, ">$ec_purity_file") or die "Can't open file $ec_purity_file\n";
-	print EC_PURITY "PROJECT_ID\tfunfam\tdops\tecnum\tuniprots_with_ec\tmostcommon_ECnum_present_in\tmostcommon_ECnum_percentage\n";
+	print EC_PURITY "PROJECT_ID\tfunfam\tdops\tecnum\tuniprots_with_ec (total_uniprot_num)\tmostcommon_ECnum_present_in\tmostcommon_ECnum_percentage\n";
 
 	foreach my $aln (glob("$FUNFAM_DIR/*.aln")) {
 		
@@ -211,16 +210,16 @@ unless(-e "$stats_file"){
 		$sum_dops=$sum_dops+$aln_dops;
 
         # get EC purity of the clusters
-        my ($tot_md5_num, $md5s_with_ec, $uniprots_withec, $ecnum, $mostcommon_ECnum_present_in) = &get_ec_purity($PROJECT_BENCHMARK_DIR, $aln, $annofile, $anno_type);
+        my ($tot_uniprot_num, $uniprots_withec, $ecnum, $mostcommon_ECnum_present_in) = &get_ec_purity($PROJECT_BENCHMARK_DIR, $aln, $annofile, $anno_type);
 
-		if($tot_md5_num){
+		if($tot_uniprot_num){
                     
             $ff_ecinfo++;
 			my $mostcommon_ECnum_percentage = ( $mostcommon_ECnum_present_in / $uniprots_withec ) * 100; #$uniq_md5_ec
 
-            print EC_PURITY "$SF\t$alnname\t$aln_dops\t$ecnum\t$md5s_with_ec\t$uniprots_withec\t$mostcommon_ECnum_present_in\t$mostcommon_ECnum_percentage\n";
+            print EC_PURITY "$project_id\t$alnname\t$aln_dops\t$ecnum\t$uniprots_withec ($tot_uniprot_num)\t$mostcommon_ECnum_present_in\t$mostcommon_ECnum_percentage\n";
             
-            print "$SF\t$alnname\t$aln_dops\t$ecnum\t$md5s_with_ec\t$uniprots_withec\t$mostcommon_ECnum_present_in\t$mostcommon_ECnum_percentage\n";
+            print "$project_id\t$alnname\t$aln_dops\t$ecnum\t$uniprots_withec ($tot_uniprot_num)\t$mostcommon_ECnum_present_in\t$mostcommon_ECnum_percentage\n";
 
 			if($mostcommon_ECnum_percentage == 100 ){
 				$p100++;
@@ -238,41 +237,50 @@ unless(-e "$stats_file"){
     
 #calculate cluster aln stats
         
-	my $s90_high_dops_percent = ($sum_s90s_high_dops/$tot_s90s)*100;
-	my $seqnum_high_dops_percent = ($sum_seqs_high_dops/$tot_seqs)*100;
+	my $s90_high_dops_percent = ($sum_s90s_high_dops/$tot_s90s) * 100;
+	$s90_high_dops_percent = nearest(0.01, $s90_high_dops_percent);
+	
+	my $seqnum_high_dops_percent = ($sum_seqs_high_dops/$tot_seqs) * 100;
+	$seqnum_high_dops_percent = nearest(0.01, $seqnum_high_dops_percent);
     
     my $avg_dops = $sum_dops/$ffnum;
-	my $avg_seqnum = $sum_seqnum/$ffnum;
+	$avg_dops = nearest(0.01, $avg_dops);
 	
-    my $highdops_ff_p = ($highdops_ff/$ffnum)*100;
+	my $avg_seqnum = $sum_seqnum/$ffnum;
+	$avg_seqnum = nearest(0.01, $avg_seqnum);
+	
+    my $highdops_ff_p = ($highdops_ff/$ffnum) * 100;
 	$highdops_ff_p = nearest(0.01, $highdops_ff_p);
 	
-    my $singletons_p = ($singletons/$ffnum)*100;
+    my $singletons_p = ($singletons/$ffnum) * 100;
 	$singletons_p = nearest(0.01, $singletons_p);
             
     # Calculate EC benchmarking stats only if >1 FunFams have EC info
     if ($ff_ecinfo > 0) {
 
-		my $ff_ecinfo_p = ($ff_ecinfo/$ffnum)*100;
+		my $ff_ecinfo_p = ($ff_ecinfo/$ffnum) * 100;
 		$ff_ecinfo_p = nearest(0.01, $ff_ecinfo_p);
-		my $p80_p = ($p80/$ff_ecinfo)*100;
+		
+		my $p80_p = ($p80/$ff_ecinfo) * 100;
 		$p80_p = nearest(0.01, $p80_p);
-		my $p90_p = ($p90/$ff_ecinfo)*100;
+		
+		my $p90_p = ($p90/$ff_ecinfo) * 100;
 		$p90_p = nearest(0.01, $p90_p);
-        my $p100_p = ($p100/$ff_ecinfo)*100;
+		
+        my $p100_p = ($p100/$ff_ecinfo) * 100;
 		$p100_p = nearest(0.01, $p100_p);
 
 		#print stats
-		print STATS "$SF\t$sc_num{$SF}\t$ffnum\t$highdops_ff_p\t$s90_high_dops_percent\t$seqnum_high_dops_percent\t$avg_dops\t$avg_seqnum\t$singletons_p\t$ff_ecinfo_p\t$p80_p\t$p90_p\t$p100_p\n";
+		print STATS "$project_id\t$sc_num{$project_id}\t$ffnum\t$highdops_ff_p\t$s90_high_dops_percent\t$seqnum_high_dops_percent\t$avg_dops\t$avg_seqnum\t$singletons_p\t$ff_ecinfo_p\t$p80_p\t$p90_p\t$p100_p\n";
         
     }
     else{
             
-        print STATS "$SF\t$sc_num{$SF}\t$ffnum\t$highdops_ff_p\t$s90_high_dops_percent\t$seqnum_high_dops_percent\t$avg_dops\t$avg_seqnum\t$singletons_p\tNA\tNA\tNA\tNA\n";
+        print STATS "$project_id\t$sc_num{$project_id}\t$ffnum\t$highdops_ff_p\t$s90_high_dops_percent\t$seqnum_high_dops_percent\t$avg_dops\t$avg_seqnum\t$singletons_p\tNA\tNA\tNA\tNA\n";
             
     }
     
-    #exit 0;
+	print "Benchmarking results can be found here: $PROJECT_BENCHMARK_DIR/\n\n";
 }
 
 close STATS;
@@ -282,6 +290,7 @@ sub get_ec_purity{
     my ($dir, $aln, $annofile, $anno_type) = @_;
     my @array;
     
+	$anno_type= lc($anno_type);
     my $alnname = basename($aln);
     
     my $FF_anno_type_dir = path("$dir/$anno_type");
