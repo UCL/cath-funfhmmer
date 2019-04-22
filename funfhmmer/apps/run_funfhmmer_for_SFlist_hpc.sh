@@ -7,10 +7,10 @@
 #$ -j y
 
 # stdout file pathname
-#$ -o ../job_status/funfhmmer.job_$JOB_ID.task_$TASK_ID.stdout
+#$ -o ../funfhmmer.job_$JOB_ID.task_$TASK_ID.stdout
 
 # stderr file pathname
-#$ -e ../job_status/funfhmmer.job_$JOB_ID.task_$TASK_ID.stderr
+#$ -e ../funfhmmer.job_$JOB_ID.task_$TASK_ID.stderr
 
 #set -x
 
