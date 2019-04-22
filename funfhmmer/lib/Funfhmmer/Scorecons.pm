@@ -55,7 +55,7 @@ sub calculate_scorecons_dops{
 	
 		if(path("$funfam_dir", "$cluster_name.aln")->exists){
 		
-			system "$bindir/scorecons/scorecons -a $funfam_dir/$cluster_name.aln -o $funfam_dir/$analysis_subfoldername/$cluster_name.aln.scorecons -m $bindir/scorecons/PET91mod.mat2 1> $cluster_dopsfile 2> $dir/$analysis_subfoldername/funfhmmer_run_dops.temp";
+			system "$bindir/scorecons/scorecons -a $funfam_dir/$cluster_name.aln -o $funfam_dir/$analysis_subfoldername/$cluster_name.aln.scorecons -m $bindir/scorecons/PET91mod.mat2 1> $cluster_dopsfile 2> $funfam_dir/$analysis_subfoldername/funfhmmer_run_dops.temp";
 			
 			unlink("$funfam_dir/$analysis_subfoldername/$cluster_name.aln.scorecons"); 
 			
