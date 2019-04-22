@@ -10,7 +10,7 @@ Funfhmmer::Anno - module to annotate sequence cluster files
 
 =head1 DESCRIPTION
 
-This is used to merge (concatenate) sequence cluster alignment files.
+This is used to get EC annotations for uniprot accessions from EBI Proteins API
 
 =cut
 
@@ -36,7 +36,6 @@ our @EXPORT_OK = qw(get_uniprot_anno_for_uniprot_list get_api_response get_SP_da
 
 =head2 get_uniprot_anno_for_uniprot_list()
 
-...
 
 	get_uniprot_anno_for_uniprot_list( $uniprot_list_filepath, $output_annofile )
 
@@ -47,17 +46,10 @@ sub get_uniprot_anno_for_uniprot_list{
 	my ($uniprot_list_filepath, $output_annofile) = @_;
 	
     # get the uniprot accessions to query
-    my $accslist = path( $list );
-    my $out_file = path( $output );
+    my $accslist = path( $uniprot_list_filepath );
+    my $out_file = path( $output_annofile );
 
     my $listname = basename( $accslist );
-
-    # create http and json data objects
-    my $http = HTTP::Tiny->new();
-    my $json = JSON->new;
-    
-    # API base url
-    my $base_url = "https://www.ebi.ac.uk/proteins/api/proteins/";
 
     my $results_fh = $out_file->openw;
     print "Getting latest UniProtKB annotations for $listname\n";
@@ -76,7 +68,7 @@ sub get_uniprot_anno_for_uniprot_list{
         chomp($acc);
     
         #print "Getting API response for: $acc...\n";
-        my $response_data = get_api_response( $acc );
+        my $response_data = get_api_response( $acc  );
 
         #print Dumper $response_data;
 
@@ -100,13 +92,20 @@ sub get_uniprot_anno_for_uniprot_list{
                 
     }
 
-    print "Completed generating EC and Swiss-Prot annotations.\nAnno file: $out_file\n";
+    print "\n\nCompleted generating EC and Swiss-Prot annotations.\nAnno file: $out_file\n\n";
     
 }
 
 sub get_api_response {
-    my $acc = shift;
-
+    my $acc = shift ;
+	
+	# create http and json data objects
+    my $http = HTTP::Tiny->new();
+    my $json = JSON->new;
+	
+	# API base url
+    my $base_url = "https://www.ebi.ac.uk/proteins/api/proteins/";
+	
     my $request_url = $base_url . $acc;
 
     my $response = $http->get($request_url, {
@@ -117,8 +116,8 @@ sub get_api_response {
     if ( ! $response->{success} ) {
         my $status = $response->{status};
         my $reason = $response->{reason};
-        my $msg = "API response failed for uniprot accession '$acc' (URL: $request_url, STATUS: $status, REASON: $reason)";
-        WARN( "$msg" );
+        my $msg = "API response failed for '$acc' (URL: $request_url, STATUS: $status, REASON: $reason)";
+        print( "-- WARNING: $msg\n" );
         return;
     }
 
