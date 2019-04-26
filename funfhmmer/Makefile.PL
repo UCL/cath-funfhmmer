@@ -18,6 +18,8 @@ WriteMakefile(
       'File::Basename' => 0,
       'File::Copy' => 0,
       'List::Util' => 0,
+      'JSON::MaybeXS' => 0,
+      'HTTP::Tiny' => 0,
   },
   BUILD_REQUIRES => {
     'Test::More' => '0.88'
