@@ -3,7 +3,6 @@ use strict;
 use warnings;
 use Path::Tiny;
 use FindBin;
-use Cath::Schema::Biomap;
 use File::Basename;
 use Data::Dumper;
 
