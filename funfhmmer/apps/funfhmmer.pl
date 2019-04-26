@@ -162,6 +162,7 @@ $LOG->info( "# Starting FunFHMMer protocol" );
 $LOG->info( "# Groupsim-matrix used: $groupsim_matrix" );
 $LOG->info( "# Evalue-GS_start:$evalthresh_gs_start\tEvalue-Q3:$evalthresh_q3" );
 $LOG->info( "# Auto_merge_low_evalues: $auto_merge_low_evalues" );
+$LOG->info( "# FunFam result dir: $funfam_dir" );
 $LOG->info( "#" );
 
 #####
