@@ -17,11 +17,11 @@
 if [ "$#" -lt 5 ]; then
 	echo "USAGE:"
     echo ""
-    echo "bash $0 --projecthome=<PROJECTHOME> --projectlist=<PROJECT_LIST> --hpc=<HPC_CLUSTER (myriad/legion/chuckle)> --projectname=<PROJECTNAME> --automerge=<0/1>"
+    echo "bash $0 --projecthome=<PROJECT_HOME> --projectlist=<PROJECT_LIST> --hpc=<HPC_CLUSTER> --projectname=<PROJECT_NAME> --automerge=<0/1>"
     echo ""
     echo "Optional:"
     echo "         --tracedir=<TREEDIR (default: 2nd col. of PROJECT_LIST)>"
-    echo "         --ffdir=<FF_DIR (default:PROJECTHOME/results)>"
+    echo "         --ffdir=<FF_DIR (default:PROJECT_HOME/results)>"
     echo ""
     echo "NOTE: Use AUTOMERGE_LOWEVAL=1 for 1st iteration of FunFHMMer and for other iterations, use 0"
     echo ""
@@ -46,7 +46,7 @@ do
         shift
         ;;
         --projectname=*)
-        PROJECTNAME="${i#*=}"
+        PROJECT_NAME="${i#*=}"
         shift
         ;;
         --automerge=*)
@@ -58,7 +58,7 @@ do
         shift
         ;;
         --ffdir=*)
-        FF_DIR="${i#*=}"
+        FFDIR="${i#*=}"
         shift
         ;;
         *)
@@ -98,6 +98,7 @@ REMOTE_USER=`whoami`
 print_date "REMOTE_USER         $REMOTE_USER"
 print_date "RUN_ENV             $HPC_CLUSTER"
 print_date "FUNFHMMER_DIR       $DIR"
+print_date "PROJECT_NAME	$PROJECT_NAME"
 print_date "SFLIST              $SFLISTFILE"
 print_date "FFDIR               $FFDIR"
 print_date "AUTOMERGE_LOWEVAL   $AUTOMERGE_LOWEVAL"
@@ -204,8 +205,7 @@ case "$HPC_CLUSTER" in
 # on chuckle cluster
 chuckle)
 
-    	SCRATCH_DIR=/scratch0/${REMOTE_USER}-funfhmmer
-    	LOCAL_TMP_DIR=$SCRATCH_DIR/${JOB_ID}_${SGE_TASK_ID}
+    	LOCAL_TMP_DIR=${FFDIR}/temp/${superfamily}_${JOB_ID}_${SGE_TASK_ID}
 
         run_hpc
         ;;
@@ -214,8 +214,7 @@ chuckle)
 legion)
         # path to gemma data in legion scratch dir
 
-        REMOTE_DATA_PATH=/scratch/scratch/${REMOTE_USER}/${PROJECT_NAME}
-        LOCAL_TMP_DIR=${REMOTE_DATA_PATH}/results/${JOB_ID}_${SGE_TASK_ID}
+        LOCAL_TMP_DIR=${FFDIR}/temp/${superfamily}_${JOB_ID}_${SGE_TASK_ID}
 
         run_hpc
         ;;
@@ -223,8 +222,7 @@ legion)
 # on myriad cluster
 myriad)
 
-        REMOTE_DATA_PATH=/scratch/scratch/${REMOTE_USER}/${PROJECT_NAME}
-    	LOCAL_TMP_DIR=${REMOTE_DATA_PATH}/results/${JOB_ID}_${SGE_TASK_ID}
+    	LOCAL_TMP_DIR=${FFDIR}/temp/${superfamily}_${JOB_ID}_${SGE_TASK_ID}
 
         run_hpc
         ;;
