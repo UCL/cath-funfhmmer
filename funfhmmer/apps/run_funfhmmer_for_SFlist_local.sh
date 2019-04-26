@@ -47,7 +47,7 @@ done
 
 # use default values of LOCAL_FF_DIR if nothing is provided
 
-LOCAL_FF_DIR=${LOCAL_FF_DIR:-$PROJECTHOME/local_run}
+LOCAL_FF_DIR=${LOCAL_FF_DIR:-$DIR/local_run}
 
 # Get the project directory
 if [ ! -d "$DIR" ]; then
