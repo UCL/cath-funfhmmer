@@ -58,6 +58,10 @@ my %medium=();
 my %large=();
 my %very_large=();
 
+unless(-e $outdir){
+    mkdir($outdir);
+}
+
 my $trace_checkfile = "$outdir/superfamilies.TRACE_CHECK";
 open(TRACE_CHECK, ">$trace_checkfile") or die "Can't open file $trace_checkfile\n";
 
