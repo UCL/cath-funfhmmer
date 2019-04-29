@@ -8,7 +8,7 @@ use File::Basename;
 use Data::Dumper;
 
 # non-core modules
-use lib "$FindBin::Bin/../lib/perl5";
+use lib "$FindBin::Bin/../lib";
 use Funfhmmer::Scorecons;
 use List::Util;
 use Math::Round;
