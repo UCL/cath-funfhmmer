@@ -39,7 +39,7 @@ APPSDIR=$DIR/apps
 RESULTSDIR=$DIR/results
 REDO_SUPS=$RESULTSDIR/REDO_SUPS.list
 
-LOCAL_TMP_DIR=$DIR/results/local_run
+LOCAL_TMP_DIR=$DIR/results
 
 mkdir -p -v $LOCAL_TMP_DIR
 
