@@ -202,8 +202,8 @@ run_hpc () {
 
 case "$HPC_CLUSTER" in
 
-# on chuckle cluster
-chuckle)
+# on pchuckle cluster
+pchuckle)
 
     	LOCAL_TMP_DIR=${FFDIR}/temp/${superfamily}_${JOB_ID}_${SGE_TASK_ID}
 
@@ -228,6 +228,6 @@ myriad)
         ;;
 
 *)
-	print_date "Invalid input. Expected chuckle|legion|myriad. Got:$HPC_CLUSTER."
+	print_date "Invalid input. Expected pchuckle|legion|myriad. Got:$HPC_CLUSTER."
 	;;
 esac
