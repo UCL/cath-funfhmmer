@@ -99,7 +99,7 @@ foreach my $file (glob("$dir/*/simple_ordering.hhconsensus.windowed/tree.trace")
     # count the no. of starting clusters
     my $filedirname = dirname($file);
     my $sc_dir = "$filedirname/starting_cluster_alignments";
-    my $sc_num = `ls $sc_dir/*.aln | wc -l`;
+    my $sc_num = `find $sc_dir -name "*.aln" | wc -l`;
     chomp($sc_num);
     
     
