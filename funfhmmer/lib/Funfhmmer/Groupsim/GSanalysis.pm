@@ -46,15 +46,6 @@ sub scoreanalysis{
 	my $merge=1;
 	my $case = "default";
 
-	if( $e > 0.001 ){
-
-	  # Keep nodes separate when E-values > 0.001
-		$merge=0;
-		$case = "E>0.001";
-
-		return ($merge,$case);
-	}
-
 	my @scores_array = @{ $scores_array_ref };
 
 	my $col_thresh1_3 = $scores_array[0]; 	# percent <=.3_col.s in MSA
